@@ -1,21 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on Chenruohan个人博客</title>
-    <link>https://caojunsheng.github.io/posts/</link>
-    <description>Recent content in Posts on Chenruohan个人博客</description>
+    <title>golang on Chenruohan个人博客</title>
+    <link>https://caojunsheng.github.io/series/golang/</link>
+    <description>Recent content in golang on Chenruohan个人博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 17 Sep 2022 17:11:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>First Post</title>
-      <link>https://caojunsheng.github.io/posts/first-post/</link>
-      <pubDate>Sat, 17 Sep 2022 17:11:28 +0800</pubDate>
-      
-      <guid>https://caojunsheng.github.io/posts/first-post/</guid>
-      <description>This is My First Blog 我告诉你，出来混，有错就要认，挨打要立正。</description>
-    </item>
-    
+    <lastBuildDate>Fri, 17 Sep 2021 17:11:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/series/golang/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>golang chan close源码分析</title>
       <link>https://caojunsheng.github.io/posts/golang/05_chan_close/</link>

@@ -2,19 +2,22 @@
 <html><head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Chenruohan个人博客 | About</title>
-    <meta name="description" content="hello everyone  ">
-    <link rel="canonical" href="https://caojunsheng.github.io/about/" />
+    <title>Chenruohan个人博客 | golang里面几个chan常见的坑</title>
+    <meta name="description" content="golang里面几个chan常见的坑 ">
+    <link rel="canonical" href="https://caojunsheng.github.io/posts/golang/01_chan/" />
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
-    <meta property="og:title" content="About" />
-<meta property="og:description" content="" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://caojunsheng.github.io/about/" />
+    <meta property="og:title" content="golang里面几个chan常见的坑" />
+<meta property="og:description" content="golang里面几个chan常见的坑" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://caojunsheng.github.io/posts/golang/01_chan/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-09-17T17:11:28+08:00" />
+<meta property="article:modified_time" content="2022-09-18T19:23:58+08:00" />
+<meta property="og:see_also" content="https://caojunsheng.github.io/posts/golang/05_chan_close/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/golang/03_chan_recv/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/golang/04_chan_send/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/golang/02_chan_data_structure/" />
 
 
     <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="About"/>
-<meta name="twitter:description" content=""/>
+<meta name="twitter:title" content="golang里面几个chan常见的坑"/>
+<meta name="twitter:description" content="golang里面几个chan常见的坑"/>
 
     
         
@@ -222,25 +225,41 @@
 
 
 
-    
-        
-        
-        
-    
-
 
 
 
     <div class="hero">
         
+        
             <div class="hero-img">
-                <img src="/images/about.jpeg" alt="">
+                <img src="/images/default.jpeg" alt="">
             </div>
         
         <div class="hero-content">
             
-            <div class="hero-title">关于</div>
-            <div>个人工作学习记录小站</div>
+            <div class="hero-title">golang里面几个chan常见的坑</div>
+            <div class="hero-subtitle"></div>
+            
+            <div class="hero-date">
+                
+                
+                    <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2021-9-17 &nbsp;</span>
+                    <span class="no-wrap"><i class="fa fa-calendar-check-o"></i> 更新于: 2022-9-18 &nbsp;</span>
+                    <span class="no-wrap"><i class="fa fa-folder"></i>
+                        收录于:
+                        
+                            <a href='/categories/golang-chan'>
+                                golang chan
+                            </a>
+                    </span>    
+                
+            </div>
+            <div class="timelong">
+                
+                <span class="no-wrap"><i class="fa fa-pencil"></i> 本文字数: 956 &nbsp;</span>
+                <span class="no-wrap"><i class="fa fa-clock-o"></i> 阅读时长: 2 分钟 &nbsp;</span>
+                <span class="no-wrap"><i class="fa fa-eye"></i> 阅读量: <span id="busuanzi_value_page_pv"></span></span>
+            </div>
         </div>
     </div>
 
@@ -253,39 +272,362 @@
             
             <div class="zhuti-l">
                 
-                <div class="content-root">
-                    <div class="long">
-                        
-                        <button class="tosides-1 text-wbd" type="button">
-                            <i class="fa fa-arrow-right"></i>
-                        </button>
-                        <button class="tosides-2 text-wbd" type="button">
-                            <i class="fa fa-arrow-left"></i>
-                        </button>
-                        
-                        <button class="toup text-wbd">
-                            <i class="fa fa-arrow-up"></i>
-                        </button>
-                        
-                    </div>
-                    
-                    <div class="content">
-                        <div class="content-self">
-                            <h3 id="hello-everyone">hello everyone</h3>
+                
 
+
+
+    
+
+
+<div class="content-root">
+    <div class="long">
+        
+        <button class="tosides-1 text-wbd">
+            <i class="fa fa-arrow-right"></i>
+        </button>
+        <button class="tosides-2 text-wbd">
+            <i class="fa fa-arrow-left"></i>
+        </button>
+        <button class="toup text-wbd">
+            <i class="fa fa-arrow-up"></i>
+        </button>
+    </div>
+    
+        
+        <div class="content">
+            <div class="content-self">
+                <h2 id="一golang里面几个chan常见的坑">一、golang里面几个chan常见的坑</h2>
+<h3 id="1向chan发送数据">1、向chan发送数据</h3>
+<p>向已关闭的chan发送数据会panic</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// src/runtime/chan.go:202
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">if</span> <span class="nx">c</span><span class="p">.</span><span class="nx">closed</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>  
+</span></span><span class="line"><span class="cl">   <span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">c</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl">   <span class="nb">panic</span><span class="p">(</span><span class="nf">plainError</span><span class="p">(</span><span class="s">&#34;send on closed channel&#34;</span><span class="p">))</span>  
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2关闭chan">2、关闭chan</h3>
+<ul>
+<li>关闭nil的chan，会panic</li>
+<li>对已关闭的chan，再次关闭chan，会panic</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// src/runtime/chan.go:355
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">closechan</span><span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">hchan</span><span class="p">)</span> <span class="p">{</span>  
+</span></span><span class="line"><span class="cl">   <span class="k">if</span> <span class="nx">c</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>  
+</span></span><span class="line"><span class="cl">      <span class="nb">panic</span><span class="p">(</span><span class="nf">plainError</span><span class="p">(</span><span class="s">&#34;close of nil channel&#34;</span><span class="p">))</span>  
+</span></span><span class="line"><span class="cl">   <span class="p">}</span>  
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">   <span class="nf">lock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">c</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl">   <span class="k">if</span> <span class="nx">c</span><span class="p">.</span><span class="nx">closed</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>  
+</span></span><span class="line"><span class="cl">      <span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">c</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl">      <span class="nb">panic</span><span class="p">(</span><span class="nf">plainError</span><span class="p">(</span><span class="s">&#34;close of closed channel&#34;</span><span class="p">))</span>  
+</span></span><span class="line"><span class="cl">   <span class="p">}</span>
+</span></span><span class="line"><span class="cl">   <span class="o">...</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3读chan数据">3、读chan数据</h3>
+<ul>
+<li>chan关闭之后，关闭前放入的数据，仍然可以读取</li>
+<li>已关闭的chan仍然可以读取，值为零值，返回值ok为false</li>
+</ul>
+<p><strong>如何优雅的关闭channel？</strong></p>
+<p>根据 sender 和 receiver 的个数，分下面几种情况：</p>
+<ol>
+<li>一个 sender，一个 receiver</li>
+<li>一个 sender， M 个 receiver</li>
+<li>N 个 sender，一个 reciver</li>
+<li>N 个 sender， M 个 receiver</li>
+</ol>
+<p>1,2两种情况，仅一个sender，直接从sender端关闭channel即可</p>
+<p>第3种情况解决方案就是增加一个传递关闭信号的 channel，receiver 通过信号 channel 下达关闭数据 channel 指令。senders 监听到关闭信号后，停止发送数据</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">rand</span><span class="p">.</span><span class="nf">Seed</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">UnixNano</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">const</span> <span class="nx">Max</span> <span class="p">=</span> <span class="mi">100000</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">const</span> <span class="nx">NumSenders</span> <span class="p">=</span> <span class="mi">1000</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">dataCh</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">int</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">stopCh</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// senders
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">NumSenders</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">for</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="k">select</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="k">case</span> <span class="o">&lt;-</span> <span class="nx">stopCh</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">return</span>
+</span></span><span class="line"><span class="cl">                <span class="k">case</span> <span class="nx">dataCh</span> <span class="o">&lt;-</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Intn</span><span class="p">(</span><span class="nx">Max</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// the receiver
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="nx">value</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">dataCh</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="nx">value</span> <span class="o">==</span> <span class="nx">Max</span><span class="o">-</span><span class="mi">1</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;send stop signal to senders.&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="nb">close</span><span class="p">(</span><span class="nx">stopCh</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="k">return</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">select</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="o">&lt;-</span> <span class="nx">time</span><span class="p">.</span><span class="nf">After</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Hour</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>对于第4种情况，和第 3 种情况不同，这里有 M 个 receiver，如果直接还是采取第 3 种解决方案，由 receiver 直接关闭 stopCh 的话，就会重复关闭一个 channel，导致 panic。因此需要增加一个中间人，M 个 receiver 都向它发送关闭 dataCh 的“请求”，中间人收到第一个请求后，就会直接下达关闭 dataCh 的指令（通过关闭 stopCh，这时就不会发生重复关闭的情况，因为 stopCh 的发送方只有中间人一个）。另外，这里的 N 个 sender 也可以向中间人发送关闭 dataCh 的请求。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">rand</span><span class="p">.</span><span class="nf">Seed</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">UnixNano</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">const</span> <span class="nx">Max</span> <span class="p">=</span> <span class="mi">100000</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">const</span> <span class="nx">NumReceivers</span> <span class="p">=</span> <span class="mi">10</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">const</span> <span class="nx">NumSenders</span> <span class="p">=</span> <span class="mi">1000</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">dataCh</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">int</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">stopCh</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// It must be a buffered channel.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">toStop</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">string</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">stoppedBy</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// moderator
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">stoppedBy</span> <span class="p">=</span> <span class="o">&lt;-</span><span class="nx">toStop</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">close</span><span class="p">(</span><span class="nx">stopCh</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}()</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// senders
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">NumSenders</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">go</span> <span class="kd">func</span><span class="p">(</span><span class="nx">id</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">for</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="nx">value</span> <span class="o">:=</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Intn</span><span class="p">(</span><span class="nx">Max</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="k">if</span> <span class="nx">value</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">select</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">case</span> <span class="nx">toStop</span> <span class="o">&lt;-</span> <span class="s">&#34;sender#&#34;</span> <span class="o">+</span> <span class="nx">id</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">default</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">return</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">                <span class="k">select</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="k">case</span> <span class="o">&lt;-</span> <span class="nx">stopCh</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">return</span>
+</span></span><span class="line"><span class="cl">                <span class="k">case</span> <span class="nx">dataCh</span> <span class="o">&lt;-</span> <span class="nx">value</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}(</span><span class="nx">strconv</span><span class="p">.</span><span class="nf">Itoa</span><span class="p">(</span><span class="nx">i</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// receivers
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">NumReceivers</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">go</span> <span class="kd">func</span><span class="p">(</span><span class="nx">id</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">for</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="k">select</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="k">case</span> <span class="o">&lt;-</span> <span class="nx">stopCh</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">return</span>
+</span></span><span class="line"><span class="cl">                <span class="k">case</span> <span class="nx">value</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">dataCh</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">if</span> <span class="nx">value</span> <span class="o">==</span> <span class="nx">Max</span><span class="o">-</span><span class="mi">1</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="k">select</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="k">case</span> <span class="nx">toStop</span> <span class="o">&lt;-</span> <span class="s">&#34;receiver#&#34;</span> <span class="o">+</span> <span class="nx">id</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                        <span class="k">default</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">                        <span class="k">return</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">                    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}(</span><span class="nx">strconv</span><span class="p">.</span><span class="nf">Itoa</span><span class="p">(</span><span class="nx">i</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">select</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="o">&lt;-</span> <span class="nx">time</span><span class="p">.</span><span class="nf">After</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Hour</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><!--stackedit_data:
+eyJoaXN0b3J5IjpbMTAxNTI3OTc0M119
+-->
+
+            </div>
+            
+                <div class="tags">
+                    
+                    <span class="down-type-item">
+                        <div class="type-text">
+                            <a href='/tags/golang'>
+                            <i class="fa fa-tag"></i> golang
+                        </a>
                         </div>
-                    </div>
-                </div>
-                <div class="content-last">
-                    <button class="aixin content-last-item efct-button">
-                        <i class="fa fa-heart"></i>
-                    </button>
+                    </span>
+                    
+                    <span class="down-type-item">
+                        <div class="type-text">
+                            <a href='/tags/chan'>
+                            <i class="fa fa-tag"></i> chan
+                        </a>
+                        </div>
+                    </span>
                     
                 </div>
+            
+        </div>
+        
+            
+            
+                <div class="pre-next">
+                    
+    
+        
+            <a href="https://caojunsheng.github.io/posts/golang/02_chan_data_structure/" class="next next-first" style="text-align: center;">
+                <div class="next-title-root">
+                    <span>golang chan数据结构</span>
+                </div>
+                <span class="next-icon"><i class="fa fa-hand-o-right"></i></span>
+            </a>
+        
+    
+    
+
+                </div>
+            
+        
+
+    
+    
+</div>
+
+
+    <div class="content-last">
+        <button class="aixin content-last-item efct-button">
+            <i class="fa fa-heart"></i>
+        </button>
+        
+    </div>
+
+
             </div>
             
             <div class="zhuti-r">
-                
                 
 <div class="zhuti-r-0">
     
@@ -353,34 +695,17 @@
 
 
 
+    
+    
+
 
 
 <div class="other">
     <div class="other-up">
-        <div class="other-qita text-wbd">最新文章</div>
+        <div class="other-qita text-wbd">相关文章</div>
         <div class="xian"></div>
     </div>
     <div class="list">
-        
-            <a href="https://caojunsheng.github.io/posts/first-post/" class="">
-                
-<a href="https://caojunsheng.github.io/posts/first-post/">
-    <div class="list-item">
-        <div class="icon-other-root">
-            
-                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
-            
-        </div>
-        <div class="list-right">
-            <div class="other-title">
-                First Post   
-            </div>
-            <div class="other-summary">This is My First Blog 我告诉你，出来混，有错就要认，挨打要立正。</div>
-            <div class="other-date">2022年9月17日</div>
-        </div>
-    </div>
-</a>
-            </a>
         
             <a href="https://caojunsheng.github.io/posts/golang/05_chan_close/" class="">
                 
@@ -502,6 +827,9 @@
         <div class="cancel efct-button">取消</div>
     </div>
 </div>
+
+
+
 
         </div>
         <footer class="footer">
