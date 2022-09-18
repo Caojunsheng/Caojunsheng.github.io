@@ -5,6 +5,16 @@
     <link>https://caojunsheng.github.io/categories/</link>
     <description>Recent content in Categories on Chenruohan个人博客</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language><atom:link href="https://caojunsheng.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <language>en-us</language>
+    <lastBuildDate>Sat, 17 Sep 2022 17:11:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Build Site Guide</title>
+      <link>https://caojunsheng.github.io/categories/build-site-guide/</link>
+      <pubDate>Sat, 17 Sep 2022 17:11:28 +0800</pubDate>
+      
+      <guid>https://caojunsheng.github.io/categories/build-site-guide/</guid>
+      <description></description>
+    </item>
+    
   </channel>
 </rss>
