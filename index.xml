@@ -61,5 +61,14 @@
       <description>一、golang里面几个chan常见的坑 1、向chan发送数据 向已关闭的chan发送数据会panic</description>
     </item>
     
+    <item>
+      <title></title>
+      <link>https://caojunsheng.github.io/posts/fix-stackedit-400/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://caojunsheng.github.io/posts/fix-stackedit-400/</guid>
+      <description>stackedit在弹出网页转到github授权界面的时候，在你点授权之前，F12打开console</description>
+    </item>
+    
   </channel>
 </rss>
