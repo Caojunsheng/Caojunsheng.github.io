@@ -67,7 +67,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://caojunsheng.github.io/posts/fix-stackedit-400/</guid>
-      <description>stackedit在弹出网页转到github授权界面的时候，在你点授权之前，F12打开console</description>
+      <description>stackedit在弹出网页转到github授权界面的时候，弹出来了http400的错误，在你点授权</description>
     </item>
     
   </channel>
