@@ -6,22 +6,22 @@
     <description>Recent content in Series on Chenruohan个人博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 29 Sep 2022 15:59:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/series/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 08 Oct 2022 11:20:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/series/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>golang</title>
+      <link>https://caojunsheng.github.io/series/golang/</link>
+      <pubDate>Sat, 08 Oct 2022 11:20:28 +0800</pubDate>
+      
+      <guid>https://caojunsheng.github.io/series/golang/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>Hugo Guide</title>
       <link>https://caojunsheng.github.io/series/hugo-guide/</link>
       <pubDate>Thu, 29 Sep 2022 15:59:28 +0800</pubDate>
       
       <guid>https://caojunsheng.github.io/series/hugo-guide/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>golang</title>
-      <link>https://caojunsheng.github.io/series/golang/</link>
-      <pubDate>Fri, 17 Sep 2021 17:11:28 +0800</pubDate>
-      
-      <guid>https://caojunsheng.github.io/series/golang/</guid>
       <description></description>
     </item>
     
