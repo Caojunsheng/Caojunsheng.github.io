@@ -2,19 +2,22 @@
 <html><head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Chenruohan个人博客 | golang</title>
-    <meta name="description" content=" ">
-    <link rel="canonical" href="https://caojunsheng.github.io/series/golang/" />
+    <title>Chenruohan个人博客 | golang内联判断</title>
+    <meta name="description" content="golang如何判断函数是否被内联 ">
+    <link rel="canonical" href="https://caojunsheng.github.io/posts/golang/07_goinline/" />
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
-    <meta property="og:title" content="golang" />
-<meta property="og:description" content="" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://caojunsheng.github.io/series/golang/" />
+    <meta property="og:title" content="golang内联判断" />
+<meta property="og:description" content="golang如何判断函数是否被内联" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://caojunsheng.github.io/posts/golang/07_goinline/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-01-14T15:15:28+08:00" />
+<meta property="article:modified_time" content="2023-01-14T15:54:42+08:00" />
+<meta property="og:see_also" content="https://caojunsheng.github.io/posts/golang/06_interview/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/golang/05_chan_close/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/golang/03_chan_recv/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/golang/04_chan_send/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/golang/02_chan_data_structure/" />
 
 
     <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="golang"/>
-<meta name="twitter:description" content=""/>
+<meta name="twitter:title" content="golang内联判断"/>
+<meta name="twitter:description" content="golang如何判断函数是否被内联"/>
 
     
         
@@ -216,16 +219,11 @@
 </header>
 
         <div id="content">
-    
 
 
 
 
 
-
-    
-        
-    
 
 
 
@@ -233,17 +231,37 @@
     <div class="hero">
         
         
-            
-                <div class="hero-img">
-                    <img src="/images/default.jpeg" alt="">
-                </div>
-            
+            <div class="hero-img">
+                <img src="/images/default.jpeg" alt="">
+            </div>
+        
         <div class="hero-content">
             
-            <h1 class="hero-title">系列：golang</h1>
+            <div class="hero-title">golang内联判断</div>
+            <div class="hero-subtitle"></div>
+            
+            <div class="hero-date">
+                
+                
+                    <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2023-1-14 &nbsp;</span>
+                    <span class="no-wrap"><i class="fa fa-calendar-check-o"></i> 更新于: 2023-1-14 &nbsp;</span>
+                    <span class="no-wrap"><i class="fa fa-folder"></i>
+                        收录于:
+                        
+                            <a href='/categories/golang'>
+                                golang
+                            </a>
+                    </span>    
+                
+            </div>
+            <div class="timelong">
+                
+                <span class="no-wrap"><i class="fa fa-pencil"></i> 本文字数: 1148 &nbsp;</span>
+                <span class="no-wrap"><i class="fa fa-clock-o"></i> 阅读时长: 3 分钟 &nbsp;</span>
+                <span class="no-wrap"><i class="fa fa-eye"></i> 阅读量: <span id="busuanzi_value_page_pv"></span></span>
+            </div>
         </div>
     </div>
-
 
 
 
@@ -254,13 +272,14 @@
             
             <div class="zhuti-l">
                 
+                
 
 
 
     
 
 
-<div class="terms-body">
+<div class="content-root">
     <div class="long">
         
         <button class="tosides-1 text-wbd">
@@ -275,519 +294,230 @@
     </div>
     
         
-        <div class="terms-row">
+        <div class="content">
+            <div class="content-self">
+                <h3 id="一什么是函数内联">一、什么是函数内联</h3>
+<p>内联优化是什么？
+内联(inlining)是编程语言编译器常用的优化手段，其优化的对象为函数，也称为函数内联。如果某函数F支持内联，则意味着编译器可以用F的函数体/函数定义替换掉对函数F进行调用的代码，以消除函数调用带来的额外开销，这个过程如下图所示：
+<img src="https://tonybai.com/wp-content/uploads/understand-go-inlining-optimisations-by-example-2.png" alt="image.png">
+但是内联并不是只有优点而无缺点，因为内联，其实就是将一个函数调用原地展开，替换成这个函数的实现。当该函数被多次调用，就会被多次展开，这会增加编译后二进制文件的大小。而非内联函数，只需要保存一份函数体的代码，然后进行调用。所以，在空间上，一般来说使用内联函数会导致生成的可执行文件变大。</p>
+<h3 id="如何判断函数是否支持内联">如何判断函数是否支持内联</h3>
+<p>我们先看下面的一段代码，testInline1、testInline2、testInline3是否能够被内联，我们猜想的是testInline1能够被内联，testInline2和testInline3不能够被内联。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">	<span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nf">testInline1</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nf">testInline2</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nf">testInline3</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">testInline1</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">a</span> <span class="p">&gt;</span> <span class="nx">b</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="nx">a</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">b</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//go:noinline
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">testInline2</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">a</span> <span class="p">&gt;</span> <span class="nx">b</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="nx">a</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">b</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">testInline3</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">10</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">a</span> <span class="p">&gt;</span> <span class="nx">b</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="nx">a</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">b</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="方法1使用go-tool-compile">方法1：使用go tool compile</h4>
+<p>我们可以使用go tool compile查看函数是否能够被内联：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">go tool compile -m<span class="o">=</span><span class="m">2</span> test.go
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>testInline1符合我们预期，是不能被内联的</li>
+<li>testInline2由于被打上注释“//go:noinline”，所以也不会被内联</li>
+<li>testInline3则是因为函数过于复杂，超过阈值80了，所以也不能被内联</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ go tool compile -m<span class="o">=</span><span class="m">2</span> test.go
+</span></span><span class="line"><span class="cl">test.go:15:6: can inline testInline1 with cost <span class="m">8</span> as: func<span class="o">(</span>int, int<span class="o">)</span> int <span class="o">{</span> <span class="k">if</span> a &gt; b <span class="o">{</span> <span class="k">return</span> a <span class="o">}</span><span class="p">;</span> <span class="k">return</span> b <span class="o">}</span>
+</span></span><span class="line"><span class="cl">test.go:23:6: cannot inline testInline2: marked go:noinline
+</span></span><span class="line"><span class="cl">test.go:30:6: cannot inline testInline3: <span class="k">function</span> too complex: cost <span class="m">96</span> exceeds budget <span class="m">80</span>
+</span></span><span class="line"><span class="cl">test.go:32:14: inlining call to fmt.Println func<span class="o">(</span>...interface <span class="o">{})</span> <span class="o">(</span>int, error<span class="o">)</span> <span class="o">{</span> var fmt..autotmp_3 int<span class="p">;</span> fmt..autotmp_3 <span class="o">=</span> &lt;nil&gt;<span class="p">;</span> var fmt..autotmp_4 error<span class="p">;</span> fmt..autotmp_4 <span class="o">=</span> &lt;nil&gt;<span class="p">;</span> fmt..autotmp_3, fmt..autotmp_4 <span class="o">=</span> fmt.Fprintln<span class="o">(</span>io.Writer<span class="o">(</span>os.Stdout<span class="o">)</span>, fmt.a...<span class="o">)</span><span class="p">;</span> <span class="k">return</span> fmt..autotmp_3, fmt..autotmp_4 <span class="o">}</span>
+</span></span><span class="line"><span class="cl">test.go:9:6: cannot inline main: <span class="k">function</span> too complex: cost <span class="m">359</span> exceeds budget <span class="m">80</span>
+</span></span><span class="line"><span class="cl">test.go:10:25: inlining call to testInline1 func<span class="o">(</span>int, int<span class="o">)</span> int <span class="o">{</span> <span class="k">if</span> a &gt; b <span class="o">{</span> <span class="k">return</span> a <span class="o">}</span><span class="p">;</span> <span class="k">return</span> b <span class="o">}</span>
+</span></span><span class="line"><span class="cl">test.go:10:13: inlining call to fmt.Println func<span class="o">(</span>...interface <span class="o">{})</span> <span class="o">(</span>int, error<span class="o">)</span> <span class="o">{</span> var fmt..autotmp_3 int<span class="p">;</span> fmt..autotmp_3 <span class="o">=</span> &lt;nil&gt;<span class="p">;</span> var fmt..autotmp_4 error<span class="p">;</span> fmt..autotmp_4 <span class="o">=</span> &lt;nil&gt;<span class="p">;</span> fmt..autotmp_3, fmt..autotmp_4 <span class="o">=</span> fmt.Fprintln<span class="o">(</span>io.Writer<span class="o">(</span>os.Stdout<span class="o">)</span>, fmt.a...<span class="o">)</span><span class="p">;</span> <span class="k">return</span> fmt..autotmp_3, fmt..autotmp_4 <span class="o">}</span>
+</span></span><span class="line"><span class="cl">test.go:11:13: inlining call to fmt.Println func<span class="o">(</span>...interface <span class="o">{})</span> <span class="o">(</span>int, error<span class="o">)</span> <span class="o">{</span> var fmt..autotmp_3 int<span class="p">;</span> fmt..autotmp_3 <span class="o">=</span> &lt;nil&gt;<span class="p">;</span> var fmt..autotmp_4 error<span class="p">;</span> fmt..autotmp_4 <span class="o">=</span> &lt;nil&gt;<span class="p">;</span> fmt..autotmp_3, fmt..autotmp_4 <span class="o">=</span> fmt.Fprintln<span class="o">(</span>io.Writer<span class="o">(</span>os.Stdout<span class="o">)</span>, fmt.a...<span class="o">)</span><span class="p">;</span> <span class="k">return</span> fmt..autotmp_3, fmt..autotmp_4 <span class="o">}</span>
+</span></span><span class="line"><span class="cl">test.go:12:13: inlining call to fmt.Println func<span class="o">(</span>...interface <span class="o">{})</span> <span class="o">(</span>int, error<span class="o">)</span> <span class="o">{</span> var fmt..autotmp_3 int<span class="p">;</span> fmt..autotmp_3 <span class="o">=</span> &lt;nil&gt;<span class="p">;</span> var fmt..autotmp_4 error<span class="p">;</span> fmt..autotmp_4 <span class="o">=</span> &lt;nil&gt;<span class="p">;</span> fmt..autotmp_3, fmt..autotmp_4 <span class="o">=</span> fmt.Fprintln<span class="o">(</span>io.Writer<span class="o">(</span>os.Stdout<span class="o">)</span>, fmt.a...<span class="o">)</span><span class="p">;</span> <span class="k">return</span> fmt..autotmp_3, fmt..autotmp_4 <span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="方法2使用go-build">方法2：使用go build</h4>
+<p>由于go tool compile仅支持单个文件,使用go build编译一个目录查询函数是否被内联
+执行如下命令：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ go build -gcflags<span class="o">=</span><span class="s2">&#34;-m=2&#34;</span> .
+</span></span><span class="line"><span class="cl">.<span class="se">\t</span>est.go:15:6: can inline testInline1 with cost <span class="m">8</span> as: func<span class="o">(</span>int, int<span class="o">)</span> int <span class="o">{</span> <span class="k">if</span> a &gt; b <span class="o">{</span> <span class="k">return</span> a <span class="o">}</span><span class="p">;</span> <span class="k">return</span> b <span class="o">}</span>
+</span></span><span class="line"><span class="cl">.<span class="se">\t</span>est.go:23:6: cannot inline testInline2: marked go:noinline
+</span></span><span class="line"><span class="cl">.<span class="se">\t</span>est.go:30:6: cannot inline testInline3: <span class="k">function</span> too complex: cost <span class="m">96</span> exceeds budget <span class="m">80</span>
+</span></span><span class="line"><span class="cl">.<span class="se">\t</span>est.go:32:14: inlining call to fmt.Println func<span class="o">(</span>...interface <span class="o">{})</span> <span class="o">(</span>int, error<span class="o">)</span> <span class="o">{</span> var fmt..autotmp_3 int<span class="p">;</span> fmt..autotmp_3 <span class="o">=</span> &lt;nil&gt;<span class="p">;</span> var fmt..autotmp_4 error<span class="p">;</span> fmt..autotmp_4 <span class="o">=</span> &lt;nil&gt;<span class="p">;</span> fmt..autotmp_3, fmt..autotmp_4 <span class="o">=</span> fmt.Fprintln<span class="o">(</span>io.Writer<span class="o">(</span>os.Stdout<span class="o">)</span>, fmt.a...<span class="o">)</span><span class="p">;</span> <span class="k">return</span> fmt..autotmp_3, fmt..autotmp_4 <span class="o">}</span>
+</span></span><span class="line"><span class="cl">.<span class="se">\t</span>est.go:9:6: cannot inline main: <span class="k">function</span> too complex: cost <span class="m">359</span> exceeds budget <span class="m">80</span>
+</span></span><span class="line"><span class="cl">.<span class="se">\t</span>est.go:10:25: inlining call to testInline1 func<span class="o">(</span>int, int<span class="o">)</span> int <span class="o">{</span> <span class="k">if</span> a &gt; b <span class="o">{</span> <span class="k">return</span> a <span class="o">}</span><span class="p">;</span> <span class="k">return</span> b <span class="o">}</span>
+</span></span><span class="line"><span class="cl">.<span class="se">\t</span>est.go:10:13: inlining call to fmt.Println func<span class="o">(</span>...interface <span class="o">{})</span> <span class="o">(</span>int, error<span class="o">)</span> <span class="o">{</span> var fmt..autotmp_3 int<span class="p">;</span> fmt..autotmp_3 <span class="o">=</span> &lt;nil&gt;<span class="p">;</span> var fmt..autotmp_4 error<span class="p">;</span> fmt..autotmp_4 <span class="o">=</span> &lt;nil&gt;<span class="p">;</span> fmt..autotmp_3, fmt..autotmp_4 <span class="o">=</span> fmt.Fprintln<span class="o">(</span>io.Writer<span class="o">(</span>os.Stdout<span class="o">)</span>, fmt.a...<span class="o">)</span><span class="p">;</span> <span class="k">return</span> fmt..autotmp_3, fmt..autotmp_4 <span class="o">}</span>
+</span></span><span class="line"><span class="cl">.<span class="se">\t</span>est.go:11:13: inlining call to fmt.Println func<span class="o">(</span>...interface <span class="o">{})</span> <span class="o">(</span>int, error<span class="o">)</span> <span class="o">{</span> var fmt..autotmp_3 int<span class="p">;</span> fmt..autotmp_3 <span class="o">=</span> &lt;nil&gt;<span class="p">;</span> var fmt..autotmp_4 error<span class="p">;</span> fmt..autotmp_4 <span class="o">=</span> &lt;nil&gt;<span class="p">;</span> fmt..autotmp_3, fmt..autotmp_4 <span class="o">=</span> fmt.Fprintln<span class="o">(</span>io.Writer<span class="o">(</span>os.Stdout<span class="o">)</span>, fmt.a...<span class="o">)</span><span class="p">;</span> <span class="k">return</span> fmt..autotmp_3, fmt..autotmp_4 <span class="o">}</span>
+</span></span><span class="line"><span class="cl">.<span class="se">\t</span>est.go:12:13: inlining call to fmt.Println func<span class="o">(</span>...interface <span class="o">{})</span> <span class="o">(</span>int, error<span class="o">)</span> <span class="o">{</span> var fmt..autotmp_3 int<span class="p">;</span> fmt..autotmp_3 <span class="o">=</span> &lt;nil&gt;<span class="p">;</span> var fmt..autotmp_4 error<span class="p">;</span> fmt..autotmp_4 <span class="o">=</span> &lt;nil&gt;<span class="p">;</span> fmt..autotmp_3, fmt..autotmp_4 <span class="o">=</span> fmt.Fprintln<span class="o">(</span>io.Writer<span class="o">(</span>os.Stdout<span class="o">)</span>, fmt.a...<span class="o">)</span><span class="p">;</span> <span class="k">return</span> fmt..autotmp_3, fmt..autotmp_4 <span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Written with <a href="https://stackedit.io/">StackEdit</a>.</p>
+</blockquote>
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbLTEzMTIxMzE1NzksMjAxNTkzNjY3NCwtMz
+MwMTY2OTA1LC0xODA0NzE2NDY2XX0=
+-->
+            </div>
             
-            <div class="terms-root">
-                
-                
-<div class="card-large">
-    <div class="card-large-img">
-
-        
-                <img data-src="/images/default.jpeg" alt="图片加载失败" class="lazyload">
-        
-    </div>
-    <div class="card-large-content">
-        <div class="up-title"><a href="https://caojunsheng.github.io/posts/golang/07_goinline/">golang内联判断</a></div>
-        <div class="up-date">
-            <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2023-1-14 &nbsp;</span>
-            <span class="no-wrap"><i class="fa fa-folder"></i>
-                收录于:
+                <div class="tags">
                     
-                    <a href='/categories/golang'>
-                        golang
-                    </a>
-            </span>
-        </div>
-        <div class="down-summary">一、什么是函数内联 内联优化是什么？ 内联(inlining)是编程语言编译器常用的优化手段，其优化的对</div>
-    </div>
-    <div class="card-readmore">
-        <a href="https://caojunsheng.github.io/posts/golang/07_goinline/">
-            <span><i class="fa fa-arrow-right"></i></span>
-        </a>
-    </div>
-</div>
-
-
-
-    
-
-
-    <div class="down-type">
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/golang'>
-                    <i class="fa fa-tag"></i> golang
-                </a>
-            </div>
-        </span>
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/inline'>
-                    <i class="fa fa-tag"></i> inline
-                </a>
-            </div>
-        </span>
-        
-    </div>
-
-<div class="dang"></div>
-            </div>
-            
-            <div class="terms-root">
-                
-                
-<div class="card-large">
-    <div class="card-large-img">
-
-        
-                <img data-src="/images/default.jpeg" alt="图片加载失败" class="lazyload">
-        
-    </div>
-    <div class="card-large-content">
-        <div class="up-title"><a href="https://caojunsheng.github.io/posts/golang/06_interview/">Go面试题及详解</a></div>
-        <div class="up-date">
-            <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2022-10-8 &nbsp;</span>
-            <span class="no-wrap"><i class="fa fa-folder"></i>
-                收录于:
+                    <span class="down-type-item">
+                        <div class="type-text">
+                            <a href='/tags/golang'>
+                            <i class="fa fa-tag"></i> golang
+                        </a>
+                        </div>
+                    </span>
                     
-                    <a href='/categories/golang-interview'>
-                        golang interview
-                    </a>
-            </span>
-        </div>
-        <div class="down-summary">Go面试题及详解 1. 下面这段代码的输出什么? 1 2 3 4 5 6 func Test1(t *testing.T) { defer func() { fmt.Println(&#34</div>
-    </div>
-    <div class="card-readmore">
-        <a href="https://caojunsheng.github.io/posts/golang/06_interview/">
-            <span><i class="fa fa-arrow-right"></i></span>
-        </a>
-    </div>
-</div>
-
-
-
-    
-
-
-    <div class="down-type">
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/golang'>
-                    <i class="fa fa-tag"></i> golang
-                </a>
-            </div>
-        </span>
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/interview'>
-                    <i class="fa fa-tag"></i> interview
-                </a>
-            </div>
-        </span>
-        
-    </div>
-
-<div class="dang"></div>
-            </div>
-            
-            <div class="terms-root">
-                
-                
-<div class="card-large">
-    <div class="card-large-img">
-
-        
-                <img data-src="/images/default.jpeg" alt="图片加载失败" class="lazyload">
-        
-    </div>
-    <div class="card-large-content">
-        <div class="up-title"><a href="https://caojunsheng.github.io/posts/golang/05_chan_close/">golang chan close源码分析</a></div>
-        <div class="up-date">
-            <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2021-9-17 &nbsp;</span>
-            <span class="no-wrap"><i class="fa fa-folder"></i>
-                收录于:
+                    <span class="down-type-item">
+                        <div class="type-text">
+                            <a href='/tags/inline'>
+                            <i class="fa fa-tag"></i> inline
+                        </a>
+                        </div>
+                    </span>
                     
-                    <a href='/categories/golang-chan'>
-                        golang chan
-                    </a>
-            </span>
-        </div>
-        <div class="down-summary">4、chan关闭流程 参考https://www.bookstack.cn/read/qcrao-Go</div>
-    </div>
-    <div class="card-readmore">
-        <a href="https://caojunsheng.github.io/posts/golang/05_chan_close/">
-            <span><i class="fa fa-arrow-right"></i></span>
-        </a>
-    </div>
-</div>
-
-
-
-    
-
-
-    <div class="down-type">
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/golang'>
-                    <i class="fa fa-tag"></i> golang
-                </a>
-            </div>
-        </span>
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/chan'>
-                    <i class="fa fa-tag"></i> chan
-                </a>
-            </div>
-        </span>
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB'>
-                    <i class="fa fa-tag"></i> 源码阅读
-                </a>
-            </div>
-        </span>
-        
-    </div>
-
-<div class="dang"></div>
-            </div>
+                </div>
             
-            <div class="terms-root">
-                
-                
-<div class="card-large">
-    <div class="card-large-img">
-
+        </div>
         
-                <img data-src="/images/default.jpeg" alt="图片加载失败" class="lazyload">
-        
-    </div>
-    <div class="card-large-content">
-        <div class="up-title"><a href="https://caojunsheng.github.io/posts/golang/03_chan_recv/">golang chan recv源码分析</a></div>
-        <div class="up-date">
-            <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2021-9-17 &nbsp;</span>
-            <span class="no-wrap"><i class="fa fa-folder"></i>
-                收录于:
+            
+            
+                <div class="pre-next">
                     
-                    <a href='/categories/golang-chan'>
-                        golang chan
-                    </a>
-            </span>
-        </div>
-        <div class="down-summary">2、chan读取源码分析 chan的读取源码入口是如下两个函数： 1 2 3 4 5 6 7 8 9 // 读取的数据放在el</div>
-    </div>
-    <div class="card-readmore">
-        <a href="https://caojunsheng.github.io/posts/golang/03_chan_recv/">
-            <span><i class="fa fa-arrow-right"></i></span>
+    
+        
+        <a href="https://caojunsheng.github.io/posts/golang/06_interview/" class="pre pre-last" style="text-align: center;">
+            <span class="pre-icon"><i class="fa fa-hand-o-left"></i></span>
+            <div class="pre-title-root">
+                <span>Go面试题及详解</span>
+            </div>
         </a>
-    </div>
-</div>
-
-
-
+        
     
 
 
-    <div class="down-type">
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/golang'>
-                    <i class="fa fa-tag"></i> golang
-                </a>
-            </div>
-        </span>
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/chan'>
-                    <i class="fa fa-tag"></i> chan
-                </a>
-            </div>
-        </span>
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB'>
-                    <i class="fa fa-tag"></i> 源码阅读
-                </a>
-            </div>
-        </span>
-        
-    </div>
-
-<div class="dang"></div>
-            </div>
+                </div>
             
-            <div class="terms-root">
-                
-                
-<div class="card-large">
-    <div class="card-large-img">
-
         
-                <img data-src="/images/default.jpeg" alt="图片加载失败" class="lazyload">
-        
-    </div>
-    <div class="card-large-content">
-        <div class="up-title"><a href="https://caojunsheng.github.io/posts/golang/04_chan_send/">golang chan send源码分析</a></div>
-        <div class="up-date">
-            <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2021-9-17 &nbsp;</span>
-            <span class="no-wrap"><i class="fa fa-folder"></i>
-                收录于:
-                    
-                    <a href='/categories/golang-chan'>
-                        golang chan
-                    </a>
-            </span>
-        </div>
-        <div class="down-summary">3、chan写入源码分析 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38</div>
-    </div>
-    <div class="card-readmore">
-        <a href="https://caojunsheng.github.io/posts/golang/04_chan_send/">
-            <span><i class="fa fa-arrow-right"></i></span>
-        </a>
-    </div>
-</div>
-
-
-
-    
-
-
-    <div class="down-type">
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/golang'>
-                    <i class="fa fa-tag"></i> golang
-                </a>
-            </div>
-        </span>
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/chan'>
-                    <i class="fa fa-tag"></i> chan
-                </a>
-            </div>
-        </span>
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB'>
-                    <i class="fa fa-tag"></i> 源码阅读
-                </a>
-            </div>
-        </span>
-        
-    </div>
-
-<div class="dang"></div>
-            </div>
-            
-            <div class="terms-root">
-                
-                
-<div class="card-large">
-    <div class="card-large-img">
-
-        
-                <img data-src="/images/default.jpeg" alt="图片加载失败" class="lazyload">
-        
-    </div>
-    <div class="card-large-content">
-        <div class="up-title"><a href="https://caojunsheng.github.io/posts/golang/02_chan_data_structure/">golang chan数据结构</a></div>
-        <div class="up-date">
-            <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2021-9-17 &nbsp;</span>
-            <span class="no-wrap"><i class="fa fa-folder"></i>
-                收录于:
-                    
-                    <a href='/categories/golang-chan'>
-                        golang chan
-                    </a>
-            </span>
-        </div>
-        <div class="down-summary">二、chan源码解读 1、chan数据结构 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 type</div>
-    </div>
-    <div class="card-readmore">
-        <a href="https://caojunsheng.github.io/posts/golang/02_chan_data_structure/">
-            <span><i class="fa fa-arrow-right"></i></span>
-        </a>
-    </div>
-</div>
-
-
-
-    
-
-
-    <div class="down-type">
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/golang'>
-                    <i class="fa fa-tag"></i> golang
-                </a>
-            </div>
-        </span>
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/chan'>
-                    <i class="fa fa-tag"></i> chan
-                </a>
-            </div>
-        </span>
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB'>
-                    <i class="fa fa-tag"></i> 源码阅读
-                </a>
-            </div>
-        </span>
-        
-    </div>
-
-<div class="dang"></div>
-            </div>
-            
-            <div class="terms-root">
-                
-                
-<div class="card-large">
-    <div class="card-large-img">
-
-        
-                <img data-src="/images/default.jpeg" alt="图片加载失败" class="lazyload">
-        
-    </div>
-    <div class="card-large-content">
-        <div class="up-title"><a href="https://caojunsheng.github.io/posts/golang/01_chan/">golang里面几个chan常见的坑</a></div>
-        <div class="up-date">
-            <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2021-9-17 &nbsp;</span>
-            <span class="no-wrap"><i class="fa fa-folder"></i>
-                收录于:
-                    
-                    <a href='/categories/golang-chan'>
-                        golang chan
-                    </a>
-            </span>
-        </div>
-        <div class="down-summary">一、golang里面几个chan常见的坑 1、向chan发送数据 向已关闭的chan发送数据会panic</div>
-    </div>
-    <div class="card-readmore">
-        <a href="https://caojunsheng.github.io/posts/golang/01_chan/">
-            <span><i class="fa fa-arrow-right"></i></span>
-        </a>
-    </div>
-</div>
-
-
-
-    
-
-
-    <div class="down-type">
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/golang'>
-                    <i class="fa fa-tag"></i> golang
-                </a>
-            </div>
-        </span>
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/chan'>
-                    <i class="fa fa-tag"></i> chan
-                </a>
-            </div>
-        </span>
-        
-    </div>
-
-<div class="dang"></div>
-            </div>
-            
-        </div>
 
     
     
 </div>
 
+
+    <div class="content-last">
+        <button class="aixin content-last-item efct-button">
+            <i class="fa fa-heart"></i>
+        </button>
+        
+    </div>
 
 
             </div>
             
             <div class="zhuti-r">
-                
                 
 <div class="zhuti-r-0">
     
@@ -855,34 +585,17 @@
 
 
 
+    
+    
+
 
 
 <div class="other">
     <div class="other-up">
-        <div class="other-qita text-wbd">最新文章</div>
+        <div class="other-qita text-wbd">相关文章</div>
         <div class="xian"></div>
     </div>
     <div class="list">
-        
-            <a href="https://caojunsheng.github.io/posts/golang/07_goinline/" class="">
-                
-<a href="https://caojunsheng.github.io/posts/golang/07_goinline/">
-    <div class="list-item">
-        <div class="icon-other-root">
-            
-                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
-            
-        </div>
-        <div class="list-right">
-            <div class="other-title">
-                golang内联判断   
-            </div>
-            <div class="other-summary">一、什么是函数内联 内联优化是什么？ 内联(inlining)是编程语言编译器常用的优化手段，其优化的对</div>
-            <div class="other-date">2023年1月14日</div>
-        </div>
-    </div>
-</a>
-            </a>
         
             <a href="https://caojunsheng.github.io/posts/golang/06_interview/" class="">
                 
@@ -904,9 +617,9 @@
 </a>
             </a>
         
-            <a href="https://caojunsheng.github.io/posts/fix-stackedit-400/" class="">
+            <a href="https://caojunsheng.github.io/posts/golang/03_chan_recv/" class="">
                 
-<a href="https://caojunsheng.github.io/posts/fix-stackedit-400/">
+<a href="https://caojunsheng.github.io/posts/golang/03_chan_recv/">
     <div class="list-item">
         <div class="icon-other-root">
             
@@ -915,30 +628,10 @@
         </div>
         <div class="list-right">
             <div class="other-title">
-                stackedit跳转github授权报错400解决   
+                golang chan recv源码分析   
             </div>
-            <div class="other-summary">stackedit在弹出网页转到github授权界面的时候，弹出来了http400的错误，在你点授权</div>
-            <div class="other-date">2022年9月29日</div>
-        </div>
-    </div>
-</a>
-            </a>
-        
-            <a href="https://caojunsheng.github.io/posts/first-post/" class="">
-                
-<a href="https://caojunsheng.github.io/posts/first-post/">
-    <div class="list-item">
-        <div class="icon-other-root">
-            
-                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
-            
-        </div>
-        <div class="list-right">
-            <div class="other-title">
-                First Post   
-            </div>
-            <div class="other-summary">This is My First Blog 我告诉你，出来混，有错就要认，挨打要立正。</div>
-            <div class="other-date">2022年9月17日</div>
+            <div class="other-summary">2、chan读取源码分析 chan的读取源码入口是如下两个函数： 1 2 3 4 5 6 7 8 9 // 读取的数据放在el</div>
+            <div class="other-date">2021年9月17日</div>
         </div>
     </div>
 </a>
@@ -964,6 +657,46 @@
 </a>
             </a>
         
+            <a href="https://caojunsheng.github.io/posts/golang/02_chan_data_structure/" class="">
+                
+<a href="https://caojunsheng.github.io/posts/golang/02_chan_data_structure/">
+    <div class="list-item">
+        <div class="icon-other-root">
+            
+                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
+            
+        </div>
+        <div class="list-right">
+            <div class="other-title">
+                golang chan数据结构   
+            </div>
+            <div class="other-summary">二、chan源码解读 1、chan数据结构 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 type</div>
+            <div class="other-date">2021年9月17日</div>
+        </div>
+    </div>
+</a>
+            </a>
+        
+            <a href="https://caojunsheng.github.io/posts/golang/04_chan_send/" class="">
+                
+<a href="https://caojunsheng.github.io/posts/golang/04_chan_send/">
+    <div class="list-item">
+        <div class="icon-other-root">
+            
+                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
+            
+        </div>
+        <div class="list-right">
+            <div class="other-title">
+                golang chan send源码分析   
+            </div>
+            <div class="other-summary">3、chan写入源码分析 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38</div>
+            <div class="other-date">2021年9月17日</div>
+        </div>
+    </div>
+</a>
+            </a>
+        
     </div>
 </div>
         </div>
@@ -978,6 +711,34 @@
         </div>
     </div>
 </div>
+
+
+<div class="appreciate">
+    <div class="appreciate-self">
+        <div class="appreciate-title">赞赏</div>
+        <div class="appreciate-btn">
+            
+                
+                    <div class="appre-btn-1">微信</div>
+                
+
+                
+            
+        </div>
+        
+        <div class="appreciate-img">
+            
+                
+                    <img class="appre-img-1" src="/images/appreciate/wechat.jpg" alt="">
+                
+                
+            
+        </div>
+        <div class="cancel efct-button">取消</div>
+    </div>
+</div>
+
+
 
 
         </div>
