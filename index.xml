@@ -97,5 +97,14 @@
       <description>一、golang里面几个chan常见的坑 1、向chan发送数据 向已关闭的chan发送数据会panic</description>
     </item>
     
+    <item>
+      <title></title>
+      <link>https://caojunsheng.github.io/posts/virtual/qemu-qom/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://caojunsheng.github.io/posts/virtual/qemu-qom/</guid>
+      <description>QEMU提供了一套面向对象编程的模型——QOM，即QEMU Object Model，几乎所有的设备如CPU、内存</description>
+    </item>
+    
   </channel>
 </rss>
