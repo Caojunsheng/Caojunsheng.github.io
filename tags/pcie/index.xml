@@ -13,7 +13,7 @@
       <pubDate>Wed, 08 May 2024 15:59:28 +0800</pubDate>
       
       <guid>https://caojunsheng.github.io/posts/linux/pcie-aer/</guid>
-      <description>1 2 3 4 5 6 7 8 9 Capabilities: [100 v2] Advanced Error Reporting UESta: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC- UnsupReq+ ACSViol- UEMsk: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC- UnsupReq+ ACSViol- UESvrt: DLP+ SDES+ TLP+ FCP+ CmpltTO- CmpltAbrt- UnxCmplt- RxOF+</description>
+      <description>1、AER简介 AER 即 Advanced Error Reporting高级错误报告，是PCIe高级特性，用于报告PCIe 错误信息。</description>
     </item>
     
   </channel>
