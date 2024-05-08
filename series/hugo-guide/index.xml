@@ -6,21 +6,33 @@
     <description>Recent content in Hugo Guide on Chenruohan个人博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 29 Sep 2022 15:59:28 +0800</lastBuildDate>
-    <atom:link href="https://caojunsheng.github.io/series/hugo-guide/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 08 May 2024 15:59:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/series/hugo-guide/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>PCIe AER寄存器值查看和修改</title>
+      <link>https://caojunsheng.github.io/posts/linux/pcie-aer/</link>
+      <pubDate>Wed, 08 May 2024 15:59:28 +0800</pubDate>
+      
+      <guid>https://caojunsheng.github.io/posts/linux/pcie-aer/</guid>
+      <description>Written with StackEdit.</description>
+    </item>
+    
     <item>
       <title>stackedit跳转github授权报错400解决</title>
       <link>https://caojunsheng.github.io/posts/fix-stackedit-400/</link>
       <pubDate>Thu, 29 Sep 2022 15:59:28 +0800</pubDate>
+      
       <guid>https://caojunsheng.github.io/posts/fix-stackedit-400/</guid>
       <description>stackedit在弹出网页转到github授权界面的时候，弹出来了http400的错误，在你点授权</description>
     </item>
+    
     <item>
       <title>First Post</title>
       <link>https://caojunsheng.github.io/posts/first-post/</link>
       <pubDate>Sat, 17 Sep 2022 17:11:28 +0800</pubDate>
+      
       <guid>https://caojunsheng.github.io/posts/first-post/</guid>
       <description>This is My First Blog 我告诉你，出来混，有错就要认，挨打要立正。 test</description>
     </item>
+    
   </channel>
 </rss>

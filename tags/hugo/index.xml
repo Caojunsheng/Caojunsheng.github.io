@@ -6,14 +6,15 @@
     <description>Recent content in hugo on Chenruohan个人博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 17 Sep 2022 17:11:28 +0800</lastBuildDate>
-    <atom:link href="https://caojunsheng.github.io/tags/hugo/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 17 Sep 2022 17:11:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/tags/hugo/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>First Post</title>
       <link>https://caojunsheng.github.io/posts/first-post/</link>
       <pubDate>Sat, 17 Sep 2022 17:11:28 +0800</pubDate>
+      
       <guid>https://caojunsheng.github.io/posts/first-post/</guid>
       <description>This is My First Blog 我告诉你，出来混，有错就要认，挨打要立正。 test</description>
     </item>
+    
   </channel>
 </rss>

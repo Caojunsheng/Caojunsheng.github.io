@@ -6,14 +6,15 @@
     <description>Recent content in golang on Chenruohan个人博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 14 Jan 2023 15:15:28 +0800</lastBuildDate>
-    <atom:link href="https://caojunsheng.github.io/categories/golang/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 14 Jan 2023 15:15:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/categories/golang/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>golang内联判断</title>
       <link>https://caojunsheng.github.io/posts/golang/07_goinline/</link>
       <pubDate>Sat, 14 Jan 2023 15:15:28 +0800</pubDate>
+      
       <guid>https://caojunsheng.github.io/posts/golang/07_goinline/</guid>
       <description>一、什么是函数内联 内联优化是什么？ 内联(inlining)是编程语言编译器常用的优化手段，其优化的对</description>
     </item>
+    
   </channel>
 </rss>
