@@ -2,11 +2,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>linux on Chenruohan个人博客</title>
-    <link>https://caojunsheng.github.io/series/linux/</link>
+    <link>https://caojunsheng.github.io/tags/linux/</link>
     <description>Recent content in linux on Chenruohan个人博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 08 May 2024 17:05:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/series/linux/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 08 May 2024 17:05:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/tags/linux/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>常用命令</title>
       <link>https://caojunsheng.github.io/posts/linux/common-cmd/</link>
@@ -14,15 +14,6 @@
       
       <guid>https://caojunsheng.github.io/posts/linux/common-cmd/</guid>
       <description>1、rpm文件解压命令 1 rpm2cpio filename | cpio -div Written with StackEdit.</description>
-    </item>
-    
-    <item>
-      <title>PCIe AER寄存器值查看和修改</title>
-      <link>https://caojunsheng.github.io/posts/linux/pcie-aer/</link>
-      <pubDate>Wed, 08 May 2024 15:59:28 +0800</pubDate>
-      
-      <guid>https://caojunsheng.github.io/posts/linux/pcie-aer/</guid>
-      <description>1、AER简介 AER 即 Advanced Error Reporting高级错误报告，是PCIe高级特性，用于报告PCIe 错误信息。</description>
     </item>
     
   </channel>
