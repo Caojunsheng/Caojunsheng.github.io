@@ -6,7 +6,16 @@
     <description>Recent content on Chenruohan个人博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 08 May 2024 15:59:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 08 May 2024 16:59:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>qemu QOM代码</title>
+      <link>https://caojunsheng.github.io/posts/virtual/qemu-qom/</link>
+      <pubDate>Wed, 08 May 2024 16:59:28 +0800</pubDate>
+      
+      <guid>https://caojunsheng.github.io/posts/virtual/qemu-qom/</guid>
+      <description>QEMU提供了一套面向对象编程的模型——QOM，即QEMU Object Model，几乎所有的设备如CPU、内存</description>
+    </item>
+    
     <item>
       <title>PCIe AER寄存器值查看和修改</title>
       <link>https://caojunsheng.github.io/posts/linux/pcie-aer/</link>
@@ -99,11 +108,11 @@
     
     <item>
       <title></title>
-      <link>https://caojunsheng.github.io/posts/virtual/qemu-qom/</link>
+      <link>https://caojunsheng.github.io/posts/linux/common-cmd/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://caojunsheng.github.io/posts/virtual/qemu-qom/</guid>
-      <description>QEMU提供了一套面向对象编程的模型——QOM，即QEMU Object Model，几乎所有的设备如CPU、内存</description>
+      <guid>https://caojunsheng.github.io/posts/linux/common-cmd/</guid>
+      <description>Written with StackEdit.</description>
     </item>
     
   </channel>

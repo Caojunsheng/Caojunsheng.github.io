@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>qemu on Chenruohan个人博客</title>
+    <link>https://caojunsheng.github.io/tags/qemu/</link>
+    <description>Recent content in qemu on Chenruohan个人博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 08 May 2024 16:59:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/tags/qemu/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>qemu QOM代码</title>
+      <link>https://caojunsheng.github.io/posts/virtual/qemu-qom/</link>
+      <pubDate>Wed, 08 May 2024 16:59:28 +0800</pubDate>
+      
+      <guid>https://caojunsheng.github.io/posts/virtual/qemu-qom/</guid>
+      <description>QEMU提供了一套面向对象编程的模型——QOM，即QEMU Object Model，几乎所有的设备如CPU、内存</description>
+    </item>
+    
+  </channel>
+</rss>
