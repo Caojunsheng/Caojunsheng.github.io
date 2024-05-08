@@ -13,7 +13,7 @@
       <pubDate>Wed, 08 May 2024 17:05:28 +0800</pubDate>
       
       <guid>https://caojunsheng.github.io/posts/linux/common-cmd/</guid>
-      <description>1、rpm文件解压命令 1 rpm2cpio filename | cpio -div Written with StackEdit.</description>
+      <description>1、rpm文件解压命令 1 rpm2cpio filename | cpio -div 2、yum一次性删除多个rpm包 yum list --installed|grep xxx|awk &#39;{print $1}&#39;|xargs yum remove -y 3、批量解压当前</description>
     </item>
     
   </channel>
