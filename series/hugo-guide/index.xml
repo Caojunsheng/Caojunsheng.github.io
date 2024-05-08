@@ -13,7 +13,7 @@
       <pubDate>Wed, 08 May 2024 15:59:28 +0800</pubDate>
       
       <guid>https://caojunsheng.github.io/posts/linux/pcie-aer/</guid>
-      <description>Written with StackEdit.</description>
+      <description>https://blog.csdn.net/zsmcdut/article/details/120151896 1 2 3 4 5 6 7 8 9 Capabilities: [100 v2] Advanced Error Reporting UESta: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC- UnsupReq+ ACSViol- UEMsk: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC- UnsupReq+ ACSViol- UESvrt: DLP+ SDES+ TLP+ FCP+ CmpltTO- CmpltAbrt- UnxCmplt-</description>
     </item>
     
     <item>
