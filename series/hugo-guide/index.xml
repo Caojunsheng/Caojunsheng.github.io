@@ -6,16 +6,7 @@
     <description>Recent content in Hugo Guide on Chenruohan个人博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 08 May 2024 15:59:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/series/hugo-guide/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>PCIe AER寄存器值查看和修改</title>
-      <link>https://caojunsheng.github.io/posts/linux/pcie-aer/</link>
-      <pubDate>Wed, 08 May 2024 15:59:28 +0800</pubDate>
-      
-      <guid>https://caojunsheng.github.io/posts/linux/pcie-aer/</guid>
-      <description>1、AER简介 AER 即 Advanced Error Reporting高级错误报告，是PCIe高级特性，用于报告PCIe 错误信息。</description>
-    </item>
-    
+    <lastBuildDate>Thu, 29 Sep 2022 15:59:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/series/hugo-guide/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>stackedit跳转github授权报错400解决</title>
       <link>https://caojunsheng.github.io/posts/fix-stackedit-400/</link>
