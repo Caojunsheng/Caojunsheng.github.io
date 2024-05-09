@@ -2,19 +2,21 @@
 <html><head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Chenruohan个人博客 | golang</title>
-    <meta name="description" content=" ">
-    <link rel="canonical" href="https://caojunsheng.github.io/categories/golang/" />
+    <title>Chenruohan个人博客</title>
+    <meta name="description" content="背景：当我们需要修改xxx_protocol.x文件新增请求参数或者返回值参数时，又或者是需要修改自 ">
+    <link rel="canonical" href="https://caojunsheng.github.io/posts/virtual/libvirt%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81/" />
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
-    <meta property="og:title" content="golang" />
-<meta property="og:description" content="" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://caojunsheng.github.io/categories/golang/" />
+    <meta property="og:title" content="" />
+<meta property="og:description" content="背景：当我们需要修改xxx_protocol.x文件新增请求参数或者返回值参数时，又或者是需要修改自" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://caojunsheng.github.io/posts/virtual/libvirt%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81/" /><meta property="article:section" content="posts" />
+
+
 
 
     <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="golang"/>
-<meta name="twitter:description" content=""/>
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="背景：当我们需要修改xxx_protocol.x文件新增请求参数或者返回值参数时，又或者是需要修改自"/>
 
     
         
@@ -216,16 +218,11 @@
 </header>
 
         <div id="content">
-    
 
 
 
 
 
-
-    
-        
-    
 
 
 
@@ -233,17 +230,34 @@
     <div class="hero">
         
         
-            
-                <div class="hero-img">
-                    <img src="/images/default.jpeg" alt="">
-                </div>
-            
+            <div class="hero-img">
+                <img src="/images/default.jpeg" alt="">
+            </div>
+        
         <div class="hero-content">
             
-            <h1 class="hero-title">分类：golang</h1>
+            <div class="hero-title"></div>
+            <div class="hero-subtitle"></div>
+            
+            <div class="hero-date">
+                
+                
+                    <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 0001-1-1 &nbsp;</span>
+                    <span class="no-wrap"><i class="fa fa-calendar-check-o"></i> 更新于: 0001-1-1 &nbsp;</span>
+                    <span class="no-wrap"><i class="fa fa-folder"></i>
+                        未收录
+                        
+                    </span>    
+                
+            </div>
+            <div class="timelong">
+                
+                <span class="no-wrap"><i class="fa fa-pencil"></i> 本文字数: 804 &nbsp;</span>
+                <span class="no-wrap"><i class="fa fa-clock-o"></i> 阅读时长: 2 分钟 &nbsp;</span>
+                <span class="no-wrap"><i class="fa fa-eye"></i> 阅读量: <span id="busuanzi_value_page_pv"></span></span>
+            </div>
         </div>
     </div>
-
 
 
 
@@ -254,13 +268,14 @@
             
             <div class="zhuti-l">
                 
+                
 
 
 
     
 
 
-<div class="terms-body">
+<div class="content-root">
     <div class="long">
         
         <button class="tosides-1 text-wbd">
@@ -275,85 +290,204 @@
     </div>
     
         
-        <div class="terms-row">
-            
-            <div class="terms-root">
-                
-                
-<div class="card-large">
-    <div class="card-large-img">
+        <div class="content">
+            <div class="content-self">
+                <blockquote>
+<p>背景：当我们需要修改xxx_protocol.x文件新增请求参数或者返回值参数时，又或者是需要修改自动生成出的代码时（gendispatch.pl），想先本地看看生成出的代码是否符合预期时，可以先在本地执行生成代码的操作，避免上环境编译才能得到生成代码。</p>
+</blockquote>
+<h3 id="1rpc文件定义">1、RPC文件定义</h3>
+<p>当前存在下面三种RPC文件定义</p>
+<ul>
+<li>src/remote/remote_protocol.x</li>
+<li>src/remote/lxc_protocol.x</li>
+<li>src/remote/qemu_protocol.x</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-protobuf" data-lang="protobuf"><span class="line"><span class="cl"><span class="c1">// remote_protocol.x
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">……
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c1">// 一些常量定义和结构体定义
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">const</span> <span class="n">REMOTE_STRING_MAX</span> <span class="o">=</span> <span class="mi">4194304</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="n">typedef</span> <span class="kt">string</span> <span class="n">remote_nonnull_string</span><span class="p">&lt;</span><span class="n">REMOTE_STRING_MAX</span><span class="p">&gt;;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="n">typedef</span> <span class="n">remote_nonnull_string</span> <span class="err">*</span><span class="n">remote_string</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">……
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c1">// 请求携带的参数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">struct</span> <span class="n">remote_connect_supports_feature_args</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="n">int</span> <span class="n">feature</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">};</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c1">// 返回值携带的参数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">struct</span> <span class="n">remote_connect_supports_feature_ret</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="n">int</span> <span class="n">supported</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">};</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">……
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c1">// 远程调用方法的序号
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">enum</span> <span class="n">remote_procedure</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="n">REMOTE_PROC_CONNECT_OPEN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="n">REMOTE_PROC_CONNECT_CLOSE</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="err">……
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2perl生成代码文件">2、perl生成代码文件</h3>
+<p>src/rpc/gendispatch.pl支持生成client和server两种代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-perl" data-lang="perl"><span class="line"><span class="cl"><span class="c1"># Bodies for dispatch functions (&#34;remote_dispatch.h&#34;).</span>
+</span></span><span class="line"><span class="cl"><span class="k">elsif</span> <span class="p">(</span><span class="nv">$mode</span> <span class="ow">eq</span> <span class="s">&#34;server&#34;</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl"><span class="c1"># Bodies for client functions (&#34;remote_client_bodies.h&#34;).</span>
+</span></span><span class="line"><span class="cl"><span class="k">elsif</span> <span class="p">(</span><span class="nv">$mode</span> <span class="ow">eq</span> <span class="s">&#34;client&#34;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>通过Makefile自动生成client和server代码</p>
+<p>src/remote/Makefile.inc.am</p>
+<pre tabindex="0"><code>remote/remote_client_bodies.h: $(srcdir)/rpc/gendispatch.pl \
+		$(REMOTE_PROTOCOL) Makefile.am
+	$(AM_V_GEN)$(PERL) -w $(srcdir)/rpc/gendispatch.pl --mode=client \
+	  remote REMOTE $(REMOTE_PROTOCOL) \
+	  &gt; remote/remote_client_bodies.h
 
-        
-                <img data-src="/images/default.jpeg" alt="图片加载失败" class="lazyload">
-        
-    </div>
-    <div class="card-large-content">
-        <div class="up-title"><a href="https://caojunsheng.github.io/posts/golang/07_goinline/">golang内联判断</a></div>
-        <div class="up-date">
-            <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2023-1-14 &nbsp;</span>
-            <span class="no-wrap"><i class="fa fa-folder"></i>
-                收录于:
+remote/lxc_client_bodies.h: $(srcdir)/rpc/gendispatch.pl \
+		$(LXC_PROTOCOL) Makefile.am
+	$(AM_V_GEN)$(PERL) -w $(srcdir)/rpc/gendispatch.pl --mode=client \
+	  lxc LXC $(LXC_PROTOCOL) \
+	  &gt; remote/lxc_client_bodies.h
+
+remote/qemu_client_bodies.h: $(srcdir)/rpc/gendispatch.pl \
+		$(QEMU_PROTOCOL) Makefile.am
+	$(AM_V_GEN)$(PERL) -w $(srcdir)/rpc/gendispatch.pl --mode=client \
+	  qemu QEMU $(QEMU_PROTOCOL) \
+	  &gt; remote/qemu_client_bodies.h
+
+remote/remote_daemon_dispatch_stubs.h: $(srcdir)/rpc/gendispatch.pl \
+		$(REMOTE_PROTOCOL) Makefile.am
+	$(AM_V_GEN)$(PERL) -w $(top_srcdir)/src/rpc/gendispatch.pl \
+	  --mode=server remote REMOTE $(REMOTE_PROTOCOL) \
+	  &gt; remote/remote_daemon_dispatch_stubs.h
+
+remote/lxc_daemon_dispatch_stubs.h: $(srcdir)/rpc/gendispatch.pl \
+		$(LXC_PROTOCOL) Makefile.am
+	$(AM_V_GEN)$(PERL) -w $(top_srcdir)/src/rpc/gendispatch.pl \
+	  --mode=server lxc LXC $(LXC_PROTOCOL) \
+	  &gt; remote/lxc_daemon_dispatch_stubs.h
+
+remote/qemu_daemon_dispatch_stubs.h: $(srcdir)/rpc/gendispatch.pl \
+		$(QEMU_PROTOCOL) Makefile.am
+	$(AM_V_GEN)$(PERL) -w $(top_srcdir)/src/rpc/gendispatch.pl \
+	  --mode=server qemu QEMU $(QEMU_PROTOCOL) \
+	  &gt; remote/qemu_daemon_dispatch_stubs.h
+</code></pre><p>上面可以再Makefile里面生成，自然也可以通过perl在本地生成。</p>
+<p>生成文件前需要再本地安装perl，perl安装外网可搜一篇通用安装教程。</p>
+<p>参考上面的Makefile，可以得到下面的生成命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 生成remote_client_bodies.h文件</span>
+</span></span><span class="line"><span class="cl">perl -w gendispatch.pl --mode<span class="o">=</span>client remote REMOTE ../remote/remote_protocol.x  &gt; ../remote/remote_client_bodies.h
+</span></span><span class="line"><span class="cl"><span class="c1"># 生成lxc_client_bodies.h文件</span>
+</span></span><span class="line"><span class="cl">perl -w gendispatch.pl --mode<span class="o">=</span>client lxc LXC ../remote/lxc_protocol.x  &gt; ../remote/lxc_client_bodies.h
+</span></span><span class="line"><span class="cl"><span class="c1"># 生成qemu_client_bodies.h文件</span>
+</span></span><span class="line"><span class="cl">perl -w gendispatch.pl --mode<span class="o">=</span>client qemu QEMU ../remote/qemu_protocol.x  &gt; ../remote/qemu_client_bodies.h
+</span></span><span class="line"><span class="cl"><span class="c1"># 生成remote_daemon_dispatch_stubs.h文件</span>
+</span></span><span class="line"><span class="cl">perl -w gendispatch.pl --mode<span class="o">=</span>server remote REMOTE ../remote/remote_protocol.x  &gt; ../remote/remote_daemon_dispatch_stubs.h
+</span></span><span class="line"><span class="cl"><span class="c1"># 生成lxc_daemon_dispatch_stubs.h文件</span>
+</span></span><span class="line"><span class="cl">perl -w gendispatch.pl --mode<span class="o">=</span>server lxc LXC ../remote/lxc_protocol.x  &gt; ../remote/lxc_daemon_dispatch_stubs.h
+</span></span><span class="line"><span class="cl"><span class="c1"># 生成qemu_daemon_dispatch_stubs.h文件</span>
+</span></span><span class="line"><span class="cl">perl -w gendispatch.pl --mode<span class="o">=</span>server qemu QEMU ../remote/qemu_protocol.x  &gt; ../remote/qemu_daemon_dispatch_stubs.h
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Written with <a href="https://stackedit.io/">StackEdit</a>.</p>
+</blockquote>
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbLTE0MDkzNzI1MjJdfQ==
+-->
+            </div>
+            
+                <div class="tags">
                     
-                    <a href='/categories/golang'>
-                        golang
-                    </a>
-            </span>
-        </div>
-        <div class="down-summary">一、什么是函数内联 内联优化是什么？ 内联(inlining)是编程语言编译器常用的优化手段，其优化的对</div>
-    </div>
-    <div class="card-readmore">
-        <a href="https://caojunsheng.github.io/posts/golang/07_goinline/">
-            <span><i class="fa fa-arrow-right"></i></span>
-        </a>
-    </div>
-</div>
-
-
-
-    
-
-
-    <div class="down-type">
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/golang'>
-                    <i class="fa fa-tag"></i> golang
-                </a>
-            </div>
-        </span>
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/inline'>
-                    <i class="fa fa-tag"></i> inline
-                </a>
-            </div>
-        </span>
-        
-    </div>
-
-<div class="dang"></div>
-            </div>
+                </div>
             
         </div>
+        
+            
+            
+                <div class="pre-next">
+                    
+    
+        
+            <a href="https://caojunsheng.github.io/posts/golang/01_chan/" class="next next-first" style="text-align: center;">
+                <div class="next-title-root">
+                    <span>golang里面几个chan常见的坑</span>
+                </div>
+                <span class="next-icon"><i class="fa fa-hand-o-right"></i></span>
+            </a>
+        
+    
+    
+
+                </div>
+            
+        
 
     
     
 </div>
 
+
+    <div class="content-last">
+        <button class="aixin content-last-item efct-button">
+            <i class="fa fa-heart"></i>
+        </button>
+        
+    </div>
 
 
             </div>
             
             <div class="zhuti-r">
-                
                 
 <div class="zhuti-r-0">
     
@@ -421,114 +555,17 @@
 
 
 
+    
+    
+
 
 
 <div class="other">
     <div class="other-up">
-        <div class="other-qita text-wbd">最新文章</div>
+        <div class="other-qita text-wbd">相关文章</div>
         <div class="xian"></div>
     </div>
     <div class="list">
-        
-            <a href="https://caojunsheng.github.io/posts/linux/gdb/" class="">
-                
-<a href="https://caojunsheng.github.io/posts/linux/gdb/">
-    <div class="list-item">
-        <div class="icon-other-root">
-            
-                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
-            
-        </div>
-        <div class="list-right">
-            <div class="other-title">
-                gdb常用命令   
-            </div>
-            <div class="other-summary">相关命令： r（run）：运行 q（quit）：退出 b（break）：打断点 • b function_name • b row_num • b file_name:row_num • b row_num if condition</div>
-            <div class="other-date">2024年5月9日</div>
-        </div>
-    </div>
-</a>
-            </a>
-        
-            <a href="https://caojunsheng.github.io/posts/linux/rpm/" class="">
-                
-<a href="https://caojunsheng.github.io/posts/linux/rpm/">
-    <div class="list-item">
-        <div class="icon-other-root">
-            
-                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
-            
-        </div>
-        <div class="list-right">
-            <div class="other-title">
-                rpm常用命令   
-            </div>
-            <div class="other-summary">1.安装一个包 1 # rpm -ivh &lt; rpm package name&gt; 2.安装参数 &ndash;force 即使覆盖属于其它包的文件也强迫安装 &ndash;nodeps 如果该RPM包的安装</div>
-            <div class="other-date">2024年5月9日</div>
-        </div>
-    </div>
-</a>
-            </a>
-        
-            <a href="https://caojunsheng.github.io/posts/linux/common-cmd/" class="">
-                
-<a href="https://caojunsheng.github.io/posts/linux/common-cmd/">
-    <div class="list-item">
-        <div class="icon-other-root">
-            
-                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
-            
-        </div>
-        <div class="list-right">
-            <div class="other-title">
-                常用命令   
-            </div>
-            <div class="other-summary">1、rpm文件解压命令 1 rpm2cpio filename | cpio -div 2、yum一次性删除多个rpm包 yum list --installed|grep xxx|awk '{print $1}'|xargs yum remove -y 3、批量解压当前</div>
-            <div class="other-date">2024年5月8日</div>
-        </div>
-    </div>
-</a>
-            </a>
-        
-            <a href="https://caojunsheng.github.io/posts/virtual/qemu-qom/" class="">
-                
-<a href="https://caojunsheng.github.io/posts/virtual/qemu-qom/">
-    <div class="list-item">
-        <div class="icon-other-root">
-            
-                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
-            
-        </div>
-        <div class="list-right">
-            <div class="other-title">
-                qemu QOM代码   
-            </div>
-            <div class="other-summary">QEMU提供了一套面向对象编程的模型——QOM，即QEMU Object Model，几乎所有的设备如CPU、内存</div>
-            <div class="other-date">2024年5月8日</div>
-        </div>
-    </div>
-</a>
-            </a>
-        
-            <a href="https://caojunsheng.github.io/posts/linux/pcie-aer/" class="">
-                
-<a href="https://caojunsheng.github.io/posts/linux/pcie-aer/">
-    <div class="list-item">
-        <div class="icon-other-root">
-            
-                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
-            
-        </div>
-        <div class="list-right">
-            <div class="other-title">
-                PCIe AER寄存器值查看和修改   
-            </div>
-            <div class="other-summary">1、AER简介 AER 即 Advanced Error Reporting高级错误报告，是PCIe高级特性，用于报告PCIe 错误信息。</div>
-            <div class="other-date">2024年5月8日</div>
-        </div>
-    </div>
-</a>
-            </a>
         
     </div>
 </div>
@@ -544,6 +581,34 @@
         </div>
     </div>
 </div>
+
+
+<div class="appreciate">
+    <div class="appreciate-self">
+        <div class="appreciate-title">赞赏</div>
+        <div class="appreciate-btn">
+            
+                
+                    <div class="appre-btn-1">微信</div>
+                
+
+                
+            
+        </div>
+        
+        <div class="appreciate-img">
+            
+                
+                    <img class="appre-img-1" src="/images/appreciate/wechat.jpg" alt="">
+                
+                
+            
+        </div>
+        <div class="cancel efct-button">取消</div>
+    </div>
+</div>
+
+
 
 
         </div>
