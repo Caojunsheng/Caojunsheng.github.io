@@ -2,19 +2,22 @@
 <html><head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Chenruohan个人博客 | linux</title>
-    <meta name="description" content=" ">
-    <link rel="canonical" href="https://caojunsheng.github.io/categories/linux/" />
+    <title>Chenruohan个人博客 | gdb常用命令</title>
+    <meta name="description" content="linux gdb常用命令 ">
+    <link rel="canonical" href="https://caojunsheng.github.io/posts/linux/gdb/" />
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
-    <meta property="og:title" content="linux" />
-<meta property="og:description" content="" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://caojunsheng.github.io/categories/linux/" />
+    <meta property="og:title" content="gdb常用命令" />
+<meta property="og:description" content="linux gdb常用命令" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://caojunsheng.github.io/posts/linux/gdb/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-05-09T17:15:28+08:00" />
+<meta property="article:modified_time" content="2024-05-09T17:13:35+08:00" />
+<meta property="og:see_also" content="https://caojunsheng.github.io/posts/linux/rpm/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/linux/common-cmd/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/linux/pcie-aer/" />
 
 
     <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="linux"/>
-<meta name="twitter:description" content=""/>
+<meta name="twitter:title" content="gdb常用命令"/>
+<meta name="twitter:description" content="linux gdb常用命令"/>
 
     
         
@@ -216,16 +219,11 @@
 </header>
 
         <div id="content">
-    
 
 
 
 
 
-
-    
-        
-    
 
 
 
@@ -233,17 +231,37 @@
     <div class="hero">
         
         
-            
-                <div class="hero-img">
-                    <img src="/images/default.jpeg" alt="">
-                </div>
-            
+            <div class="hero-img">
+                <img src="/images/default.jpeg" alt="">
+            </div>
+        
         <div class="hero-content">
             
-            <h1 class="hero-title">分类：linux</h1>
+            <div class="hero-title">gdb常用命令</div>
+            <div class="hero-subtitle"></div>
+            
+            <div class="hero-date">
+                
+                
+                    <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2024-5-9 &nbsp;</span>
+                    <span class="no-wrap"><i class="fa fa-calendar-check-o"></i> 更新于: 2024-5-9 &nbsp;</span>
+                    <span class="no-wrap"><i class="fa fa-folder"></i>
+                        收录于:
+                        
+                            <a href='/categories/linux'>
+                                linux
+                            </a>
+                    </span>    
+                
+            </div>
+            <div class="timelong">
+                
+                <span class="no-wrap"><i class="fa fa-pencil"></i> 本文字数: 483 &nbsp;</span>
+                <span class="no-wrap"><i class="fa fa-clock-o"></i> 阅读时长: 1 分钟 &nbsp;</span>
+                <span class="no-wrap"><i class="fa fa-eye"></i> 阅读量: <span id="busuanzi_value_page_pv"></span></span>
+            </div>
         </div>
     </div>
-
 
 
 
@@ -254,13 +272,14 @@
             
             <div class="zhuti-l">
                 
+                
 
 
 
     
 
 
-<div class="terms-body">
+<div class="content-root">
     <div class="long">
         
         <button class="tosides-1 text-wbd">
@@ -275,236 +294,98 @@
     </div>
     
         
-        <div class="terms-row">
+        <div class="content">
+            <div class="content-self">
+                <p><strong>相关命令：</strong>
+r（run）：运行
+q（quit）：退出
+b（break）：打断点
+• b function_name
+• b row_num
+• b file_name:row_num
+• b row_num if condition
+c（continue）：继续执行
+print $xx：打印具体变量
+watch $xx：监控一个对象
+(gdb) rwatch num          当要观察的变量num被读时，程序暂停运行
+(gdb) awatch num          当要观察的变量num被读或被写，程序暂停运行
+(gdb) info watchpoints    查看当前设置的所有观察点
+disable $num：禁用断点
+d $num（delete）：删除断点
+n（next）：单步执行
+s（step）：跳入一个函数
+finish：跳出函数
+whatis $xx：查看变量类型
+winheight：启动可视化调试</p>
+<p>bt ：bt是 backtrace 指令的缩写，显示所有的函数调用栈的信息，栈中的每个函数都被分配了一个编号，最近被调用的函数在 0 号帧中（栈顶），并且每个帧占用一行。
+bt n ：显示函数调用栈从栈顶算起的n帧信息（n 表示一个正整数）。
+bt -n ：显示函数调用栈从栈底算起的n帧信息。
+bt full ：显示栈中所有信息如：函数参数，本地变量等。
+bt full n ：显示函数调用栈从栈顶算起的n帧的所有信息。
+bt full -n ：显示函数调用栈从栈底算起的n帧的所有信息。</p>
+<p>set print pretty on：格式化打印</p>
+<p>连续输出数组
+(gdb) set print array-indexes on
+输出index从0开始共十个
+(gdb) p buffer[0]@10</p>
+<blockquote>
+<p>Written with <a href="https://stackedit.io/">StackEdit</a>.</p>
+</blockquote>
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbLTMxOTcyNDI1MF19
+-->
+            </div>
             
-            <div class="terms-root">
-                
-                
-<div class="card-large">
-    <div class="card-large-img">
-
-        
-                <img data-src="/images/default.jpeg" alt="图片加载失败" class="lazyload">
-        
-    </div>
-    <div class="card-large-content">
-        <div class="up-title"><a href="https://caojunsheng.github.io/posts/linux/gdb/">gdb常用命令</a></div>
-        <div class="up-date">
-            <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2024-5-9 &nbsp;</span>
-            <span class="no-wrap"><i class="fa fa-folder"></i>
-                收录于:
+                <div class="tags">
                     
-                    <a href='/categories/linux'>
-                        linux
-                    </a>
-            </span>
-        </div>
-        <div class="down-summary">相关命令： r（run）：运行 q（quit）：退出 b（break）：打断点 • b function_name • b row_num • b file_name:row_num • b row_num if condition</div>
-    </div>
-    <div class="card-readmore">
-        <a href="https://caojunsheng.github.io/posts/linux/gdb/">
-            <span><i class="fa fa-arrow-right"></i></span>
-        </a>
-    </div>
-</div>
-
-
-
-    
-
-
-    <div class="down-type">
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/gdb'>
-                    <i class="fa fa-tag"></i> gdb
-                </a>
-            </div>
-        </span>
-        
-    </div>
-
-<div class="dang"></div>
-            </div>
-            
-            <div class="terms-root">
-                
-                
-<div class="card-large">
-    <div class="card-large-img">
-
-        
-                <img data-src="/images/default.jpeg" alt="图片加载失败" class="lazyload">
-        
-    </div>
-    <div class="card-large-content">
-        <div class="up-title"><a href="https://caojunsheng.github.io/posts/linux/rpm/">rpm常用命令</a></div>
-        <div class="up-date">
-            <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2024-5-9 &nbsp;</span>
-            <span class="no-wrap"><i class="fa fa-folder"></i>
-                收录于:
+                    <span class="down-type-item">
+                        <div class="type-text">
+                            <a href='/tags/gdb'>
+                            <i class="fa fa-tag"></i> gdb
+                        </a>
+                        </div>
+                    </span>
                     
-                    <a href='/categories/linux'>
-                        linux
-                    </a>
-            </span>
-        </div>
-        <div class="down-summary">1.安装一个包 1 # rpm -ivh &lt; rpm package name&gt; 2.安装参数 &ndash;force 即使覆盖属于其它包的文件也强迫安装 &ndash;nodeps 如果该RPM包的安装</div>
-    </div>
-    <div class="card-readmore">
-        <a href="https://caojunsheng.github.io/posts/linux/rpm/">
-            <span><i class="fa fa-arrow-right"></i></span>
-        </a>
-    </div>
-</div>
-
-
-
-    
-
-
-    <div class="down-type">
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/rpm'>
-                    <i class="fa fa-tag"></i> rpm
-                </a>
-            </div>
-        </span>
-        
-    </div>
-
-<div class="dang"></div>
-            </div>
+                </div>
             
-            <div class="terms-root">
-                
-                
-<div class="card-large">
-    <div class="card-large-img">
-
+        </div>
         
-                <img data-src="/images/default.jpeg" alt="图片加载失败" class="lazyload">
-        
-    </div>
-    <div class="card-large-content">
-        <div class="up-title"><a href="https://caojunsheng.github.io/posts/linux/common-cmd/">常用命令</a></div>
-        <div class="up-date">
-            <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2024-5-8 &nbsp;</span>
-            <span class="no-wrap"><i class="fa fa-folder"></i>
-                收录于:
+            
+            
+                <div class="pre-next">
                     
-                    <a href='/categories/linux'>
-                        linux
-                    </a>
-            </span>
-        </div>
-        <div class="down-summary">1、rpm文件解压命令 1 rpm2cpio filename | cpio -div 2、yum一次性删除多个rpm包 yum list --installed|grep xxx|awk '{print $1}'|xargs yum remove -y 3、批量解压当前</div>
-    </div>
-    <div class="card-readmore">
-        <a href="https://caojunsheng.github.io/posts/linux/common-cmd/">
-            <span><i class="fa fa-arrow-right"></i></span>
+    
+        
+        <a href="https://caojunsheng.github.io/posts/linux/rpm/" class="pre pre-last" style="text-align: center;">
+            <span class="pre-icon"><i class="fa fa-hand-o-left"></i></span>
+            <div class="pre-title-root">
+                <span>rpm常用命令</span>
+            </div>
         </a>
-    </div>
-</div>
-
-
-
+        
     
 
 
-    <div class="down-type">
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/linux'>
-                    <i class="fa fa-tag"></i> linux
-                </a>
-            </div>
-        </span>
-        
-    </div>
-
-<div class="dang"></div>
-            </div>
+                </div>
             
-            <div class="terms-root">
-                
-                
-<div class="card-large">
-    <div class="card-large-img">
-
         
-                <img data-src="/images/default.jpeg" alt="图片加载失败" class="lazyload">
-        
-    </div>
-    <div class="card-large-content">
-        <div class="up-title"><a href="https://caojunsheng.github.io/posts/linux/pcie-aer/">PCIe AER寄存器值查看和修改</a></div>
-        <div class="up-date">
-            <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2024-5-8 &nbsp;</span>
-            <span class="no-wrap"><i class="fa fa-folder"></i>
-                收录于:
-                    
-                    <a href='/categories/linux'>
-                        linux
-                    </a>
-            </span>
-        </div>
-        <div class="down-summary">1、AER简介 AER 即 Advanced Error Reporting高级错误报告，是PCIe高级特性，用于报告PCIe 错误信息。</div>
-    </div>
-    <div class="card-readmore">
-        <a href="https://caojunsheng.github.io/posts/linux/pcie-aer/">
-            <span><i class="fa fa-arrow-right"></i></span>
-        </a>
-    </div>
-</div>
-
-
-
-    
-
-
-    <div class="down-type">
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/pcie'>
-                    <i class="fa fa-tag"></i> PCIe
-                </a>
-            </div>
-        </span>
-        
-    </div>
-
-<div class="dang"></div>
-            </div>
-            
-        </div>
 
     
     
 </div>
 
+
+    <div class="content-last">
+        <button class="aixin content-last-item efct-button">
+            <i class="fa fa-heart"></i>
+        </button>
+        
+    </div>
 
 
             </div>
             
             <div class="zhuti-r">
-                
                 
 <div class="zhuti-r-0">
     
@@ -572,34 +453,17 @@
 
 
 
+    
+    
+
 
 
 <div class="other">
     <div class="other-up">
-        <div class="other-qita text-wbd">最新文章</div>
+        <div class="other-qita text-wbd">相关文章</div>
         <div class="xian"></div>
     </div>
     <div class="list">
-        
-            <a href="https://caojunsheng.github.io/posts/linux/gdb/" class="">
-                
-<a href="https://caojunsheng.github.io/posts/linux/gdb/">
-    <div class="list-item">
-        <div class="icon-other-root">
-            
-                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
-            
-        </div>
-        <div class="list-right">
-            <div class="other-title">
-                gdb常用命令   
-            </div>
-            <div class="other-summary">相关命令： r（run）：运行 q（quit）：退出 b（break）：打断点 • b function_name • b row_num • b file_name:row_num • b row_num if condition</div>
-            <div class="other-date">2024年5月9日</div>
-        </div>
-    </div>
-</a>
-            </a>
         
             <a href="https://caojunsheng.github.io/posts/linux/rpm/" class="">
                 
@@ -641,26 +505,6 @@
 </a>
             </a>
         
-            <a href="https://caojunsheng.github.io/posts/virtual/qemu-qom/" class="">
-                
-<a href="https://caojunsheng.github.io/posts/virtual/qemu-qom/">
-    <div class="list-item">
-        <div class="icon-other-root">
-            
-                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
-            
-        </div>
-        <div class="list-right">
-            <div class="other-title">
-                qemu QOM代码   
-            </div>
-            <div class="other-summary">QEMU提供了一套面向对象编程的模型——QOM，即QEMU Object Model，几乎所有的设备如CPU、内存</div>
-            <div class="other-date">2024年5月8日</div>
-        </div>
-    </div>
-</a>
-            </a>
-        
             <a href="https://caojunsheng.github.io/posts/linux/pcie-aer/" class="">
                 
 <a href="https://caojunsheng.github.io/posts/linux/pcie-aer/">
@@ -681,6 +525,26 @@
 </a>
             </a>
         
+            <a href="https://caojunsheng.github.io/posts/virtual/qemu-qom/" class="">
+                
+<a href="https://caojunsheng.github.io/posts/virtual/qemu-qom/">
+    <div class="list-item">
+        <div class="icon-other-root">
+            
+                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
+            
+        </div>
+        <div class="list-right">
+            <div class="other-title">
+                qemu QOM代码   
+            </div>
+            <div class="other-summary">QEMU提供了一套面向对象编程的模型——QOM，即QEMU Object Model，几乎所有的设备如CPU、内存</div>
+            <div class="other-date">2024年5月8日</div>
+        </div>
+    </div>
+</a>
+            </a>
+        
     </div>
 </div>
         </div>
@@ -695,6 +559,34 @@
         </div>
     </div>
 </div>
+
+
+<div class="appreciate">
+    <div class="appreciate-self">
+        <div class="appreciate-title">赞赏</div>
+        <div class="appreciate-btn">
+            
+                
+                    <div class="appre-btn-1">微信</div>
+                
+
+                
+            
+        </div>
+        
+        <div class="appreciate-img">
+            
+                
+                    <img class="appre-img-1" src="/images/appreciate/wechat.jpg" alt="">
+                
+                
+            
+        </div>
+        <div class="cancel efct-button">取消</div>
+    </div>
+</div>
+
+
 
 
         </div>
