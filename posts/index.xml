@@ -17,6 +17,15 @@
     </item>
     
     <item>
+      <title>rpm常用命令</title>
+      <link>https://caojunsheng.github.io/posts/linux/rpm/</link>
+      <pubDate>Thu, 09 May 2024 17:05:28 +0800</pubDate>
+      
+      <guid>https://caojunsheng.github.io/posts/linux/rpm/</guid>
+      <description>1.安装一个包 1 # rpm -ivh &amp;lt; rpm package name&amp;gt; 2.安装参数 &amp;ndash;force 即使覆盖属于其它包的文件也强迫安装 &amp;ndash;nodeps 如果该RPM包的安装</description>
+    </item>
+    
+    <item>
       <title>常用命令</title>
       <link>https://caojunsheng.github.io/posts/linux/common-cmd/</link>
       <pubDate>Wed, 08 May 2024 17:05:28 +0800</pubDate>
@@ -122,15 +131,6 @@
       
       <guid>https://caojunsheng.github.io/posts/golang/01_chan/</guid>
       <description>一、golang里面几个chan常见的坑 1、向chan发送数据 向已关闭的chan发送数据会panic</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://caojunsheng.github.io/posts/linux/rpm/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://caojunsheng.github.io/posts/linux/rpm/</guid>
-      <description>1.安装一个包 1 # rpm -ivh &amp;lt; rpm package name&amp;gt; 2.安装参数 &amp;ndash;force 即使覆盖属于其它包的文件也强迫安装 &amp;ndash;nodeps 如果该RPM包的安装</description>
     </item>
     
   </channel>
