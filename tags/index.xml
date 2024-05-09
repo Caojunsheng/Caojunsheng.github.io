@@ -6,7 +6,16 @@
     <description>Recent content in Tags on Chenruohan个人博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 09 May 2024 17:15:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 09 May 2024 17:59:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>libvirt</title>
+      <link>https://caojunsheng.github.io/tags/libvirt/</link>
+      <pubDate>Thu, 09 May 2024 17:59:28 +0800</pubDate>
+      
+      <guid>https://caojunsheng.github.io/tags/libvirt/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>gdb</title>
       <link>https://caojunsheng.github.io/tags/gdb/</link>

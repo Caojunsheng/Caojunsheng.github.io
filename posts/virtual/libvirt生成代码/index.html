@@ -2,22 +2,22 @@
 <html><head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Chenruohan个人博客 | golang chan send源码分析</title>
-    <meta name="description" content="golang chan send源码分析 ">
-    <link rel="canonical" href="https://caojunsheng.github.io/posts/golang/04_chan_send/" />
+    <title>Chenruohan个人博客 | libvirt 生成代码</title>
+    <meta name="description" content="libvirt自动生成代码 ">
+    <link rel="canonical" href="https://caojunsheng.github.io/posts/virtual/libvirt%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81/" />
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
-    <meta property="og:title" content="golang chan send源码分析" />
-<meta property="og:description" content="golang chan send源码分析" />
+    <meta property="og:title" content="libvirt 生成代码" />
+<meta property="og:description" content="libvirt自动生成代码" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://caojunsheng.github.io/posts/golang/04_chan_send/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2021-09-17T17:11:28+08:00" />
-<meta property="article:modified_time" content="2022-09-18T19:23:58+08:00" />
-<meta property="og:see_also" content="https://caojunsheng.github.io/posts/golang/07_goinline/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/golang/06_interview/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/golang/05_chan_close/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/golang/03_chan_recv/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/golang/02_chan_data_structure/" />
+<meta property="og:url" content="https://caojunsheng.github.io/posts/virtual/libvirt%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-05-09T17:59:28+08:00" />
+<meta property="article:modified_time" content="2024-05-09T17:59:28+08:00" />
+<meta property="og:see_also" content="https://caojunsheng.github.io/posts/virtual/qemu-qom/" />
 
 
     <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="golang chan send源码分析"/>
-<meta name="twitter:description" content="golang chan send源码分析"/>
+<meta name="twitter:title" content="libvirt 生成代码"/>
+<meta name="twitter:description" content="libvirt自动生成代码"/>
 
     
         
@@ -237,26 +237,26 @@
         
         <div class="hero-content">
             
-            <div class="hero-title">golang chan send源码分析</div>
+            <div class="hero-title">libvirt 生成代码</div>
             <div class="hero-subtitle"></div>
             
             <div class="hero-date">
                 
                 
-                    <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2021-9-17 &nbsp;</span>
-                    <span class="no-wrap"><i class="fa fa-calendar-check-o"></i> 更新于: 2022-9-18 &nbsp;</span>
+                    <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2024-5-9 &nbsp;</span>
+                    <span class="no-wrap"><i class="fa fa-calendar-check-o"></i> 更新于: 2024-5-9 &nbsp;</span>
                     <span class="no-wrap"><i class="fa fa-folder"></i>
                         收录于:
                         
-                            <a href='/categories/golang-chan'>
-                                golang chan
+                            <a href='/categories/libvirt'>
+                                libvirt
                             </a>
                     </span>    
                 
             </div>
             <div class="timelong">
                 
-                <span class="no-wrap"><i class="fa fa-pencil"></i> 本文字数: 998 &nbsp;</span>
+                <span class="no-wrap"><i class="fa fa-pencil"></i> 本文字数: 839 &nbsp;</span>
                 <span class="no-wrap"><i class="fa fa-clock-o"></i> 阅读时长: 2 分钟 &nbsp;</span>
                 <span class="no-wrap"><i class="fa fa-eye"></i> 阅读量: <span id="busuanzi_value_page_pv"></span></span>
             </div>
@@ -296,220 +296,84 @@
         
         <div class="content">
             <div class="content-self">
-                <h3 id="3chan写入源码分析">3、chan写入源码分析</h3>
+                <blockquote>
+<p>背景：当我们需要修改xxx_protocol.x文件新增请求参数或者返回值参数时，又或者是需要修改自动生成出的代码时（gendispatch.pl），想先本地看看生成出的代码是否符合预期时，可以先在本地执行生成代码的操作，避免上环境编译才能得到生成代码。</p>
+</blockquote>
+<h3 id="1rpc文件定义">1、RPC文件定义</h3>
+<p>当前存在下面三种RPC文件定义</p>
+<ul>
+<li>src/remote/remote_protocol.x</li>
+<li>src/remote/lxc_protocol.x</li>
+<li>src/remote/qemu_protocol.x</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">  1
-</span><span class="lnt">  2
-</span><span class="lnt">  3
-</span><span class="lnt">  4
-</span><span class="lnt">  5
-</span><span class="lnt">  6
-</span><span class="lnt">  7
-</span><span class="lnt">  8
-</span><span class="lnt">  9
-</span><span class="lnt"> 10
-</span><span class="lnt"> 11
-</span><span class="lnt"> 12
-</span><span class="lnt"> 13
-</span><span class="lnt"> 14
-</span><span class="lnt"> 15
-</span><span class="lnt"> 16
-</span><span class="lnt"> 17
-</span><span class="lnt"> 18
-</span><span class="lnt"> 19
-</span><span class="lnt"> 20
-</span><span class="lnt"> 21
-</span><span class="lnt"> 22
-</span><span class="lnt"> 23
-</span><span class="lnt"> 24
-</span><span class="lnt"> 25
-</span><span class="lnt"> 26
-</span><span class="lnt"> 27
-</span><span class="lnt"> 28
-</span><span class="lnt"> 29
-</span><span class="lnt"> 30
-</span><span class="lnt"> 31
-</span><span class="lnt"> 32
-</span><span class="lnt"> 33
-</span><span class="lnt"> 34
-</span><span class="lnt"> 35
-</span><span class="lnt"> 36
-</span><span class="lnt"> 37
-</span><span class="lnt"> 38
-</span><span class="lnt"> 39
-</span><span class="lnt"> 40
-</span><span class="lnt"> 41
-</span><span class="lnt"> 42
-</span><span class="lnt"> 43
-</span><span class="lnt"> 44
-</span><span class="lnt"> 45
-</span><span class="lnt"> 46
-</span><span class="lnt"> 47
-</span><span class="lnt"> 48
-</span><span class="lnt"> 49
-</span><span class="lnt"> 50
-</span><span class="lnt"> 51
-</span><span class="lnt"> 52
-</span><span class="lnt"> 53
-</span><span class="lnt"> 54
-</span><span class="lnt"> 55
-</span><span class="lnt"> 56
-</span><span class="lnt"> 57
-</span><span class="lnt"> 58
-</span><span class="lnt"> 59
-</span><span class="lnt"> 60
-</span><span class="lnt"> 61
-</span><span class="lnt"> 62
-</span><span class="lnt"> 63
-</span><span class="lnt"> 64
-</span><span class="lnt"> 65
-</span><span class="lnt"> 66
-</span><span class="lnt"> 67
-</span><span class="lnt"> 68
-</span><span class="lnt"> 69
-</span><span class="lnt"> 70
-</span><span class="lnt"> 71
-</span><span class="lnt"> 72
-</span><span class="lnt"> 73
-</span><span class="lnt"> 74
-</span><span class="lnt"> 75
-</span><span class="lnt"> 76
-</span><span class="lnt"> 77
-</span><span class="lnt"> 78
-</span><span class="lnt"> 79
-</span><span class="lnt"> 80
-</span><span class="lnt"> 81
-</span><span class="lnt"> 82
-</span><span class="lnt"> 83
-</span><span class="lnt"> 84
-</span><span class="lnt"> 85
-</span><span class="lnt"> 86
-</span><span class="lnt"> 87
-</span><span class="lnt"> 88
-</span><span class="lnt"> 89
-</span><span class="lnt"> 90
-</span><span class="lnt"> 91
-</span><span class="lnt"> 92
-</span><span class="lnt"> 93
-</span><span class="lnt"> 94
-</span><span class="lnt"> 95
-</span><span class="lnt"> 96
-</span><span class="lnt"> 97
-</span><span class="lnt"> 98
-</span><span class="lnt"> 99
-</span><span class="lnt">100
-</span><span class="lnt">101
-</span><span class="lnt">102
-</span><span class="lnt">103
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">chansend</span><span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">hchan</span><span class="p">,</span> <span class="nx">ep</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span><span class="p">,</span> <span class="nx">block</span> <span class="kt">bool</span><span class="p">,</span> <span class="nx">callerpc</span> <span class="kt">uintptr</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// 如果chan是空
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">if</span> <span class="nx">c</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	    <span class="c1">// 非阻塞，直接返回false，表示未发送成功
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="k">if</span> <span class="p">!</span><span class="nx">block</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">			<span class="k">return</span> <span class="kc">false</span>
-</span></span><span class="line"><span class="cl">		<span class="p">}</span>
-</span></span><span class="line"><span class="cl">		<span class="c1">// 阻塞的，挂起goroutine
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nf">gopark</span><span class="p">(</span><span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">waitReasonChanSendNilChan</span><span class="p">,</span> <span class="nx">traceEvGoStop</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">		<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;unreachable&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="o">...</span>
-</span></span><span class="line"><span class="cl">	<span class="c1">// 如果是非阻塞的，chan未关闭，且chan的buffer已经满了，则返回发送失败
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">if</span> <span class="p">!</span><span class="nx">block</span> <span class="o">&amp;&amp;</span> <span class="nx">c</span><span class="p">.</span><span class="nx">closed</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nf">full</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="kc">false</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="kd">var</span> <span class="nx">t0</span> <span class="kt">int64</span>
-</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">blockprofilerate</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">t0</span> <span class="p">=</span> <span class="nf">cputicks</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="nf">lock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">c</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">c</span><span class="p">.</span><span class="nx">closed</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">c</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">		<span class="c1">// 如果chan已经关闭了，再向chan发送数据，直接报panic
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nb">panic</span><span class="p">(</span><span class="nf">plainError</span><span class="p">(</span><span class="s">&#34;send on closed channel&#34;</span><span class="p">))</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">sg</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">recvq</span><span class="p">.</span><span class="nf">dequeue</span><span class="p">();</span> <span class="nx">sg</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="c1">// 如果有接受者在等待，直接将发送的数据拷贝到
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nf">send</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="nx">sg</span><span class="p">,</span> <span class="nx">ep</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span> <span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">c</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span> <span class="p">},</span> <span class="mi">3</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="kc">true</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="c1">// 如果缓冲的chan，还有空间，将发送的数据拷贝到buffer中
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">if</span> <span class="nx">c</span><span class="p">.</span><span class="nx">qcount</span> <span class="p">&lt;</span> <span class="nx">c</span><span class="p">.</span><span class="nx">dataqsiz</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">qp</span> <span class="o">:=</span> <span class="nf">chanbuf</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">sendx</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nx">raceenabled</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">			<span class="nf">racenotify</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">sendx</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">		<span class="p">}</span>
-</span></span><span class="line"><span class="cl">		<span class="nf">typedmemmove</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">elemtype</span><span class="p">,</span> <span class="nx">qp</span><span class="p">,</span> <span class="nx">ep</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">		<span class="c1">// 发送游标+1
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nx">c</span><span class="p">.</span><span class="nx">sendx</span><span class="o">++</span>
-</span></span><span class="line"><span class="cl">		<span class="c1">// 发送游标已经到末尾了，重新移到队头
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="k">if</span> <span class="nx">c</span><span class="p">.</span><span class="nx">sendx</span> <span class="o">==</span> <span class="nx">c</span><span class="p">.</span><span class="nx">dataqsiz</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">			<span class="nx">c</span><span class="p">.</span><span class="nx">sendx</span> <span class="p">=</span> <span class="mi">0</span>
-</span></span><span class="line"><span class="cl">		<span class="p">}</span>
-</span></span><span class="line"><span class="cl">		<span class="c1">// 缓冲区数量+1
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nx">c</span><span class="p">.</span><span class="nx">qcount</span><span class="o">++</span>
-</span></span><span class="line"><span class="cl">		<span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">c</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="kc">true</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// 非阻塞的chan，直接返回写入失败
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">if</span> <span class="p">!</span><span class="nx">block</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">c</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="kc">false</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// chan满了，发送者会被阻塞，构造一个sudog挂起
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">gp</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">mysg</span> <span class="o">:=</span> <span class="nf">acquireSudog</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">mysg</span><span class="p">.</span><span class="nx">releasetime</span> <span class="p">=</span> <span class="mi">0</span>
-</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">t0</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">mysg</span><span class="p">.</span><span class="nx">releasetime</span> <span class="p">=</span> <span class="o">-</span><span class="mi">1</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="nx">mysg</span><span class="p">.</span><span class="nx">elem</span> <span class="p">=</span> <span class="nx">ep</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">mysg</span><span class="p">.</span><span class="nx">waitlink</span> <span class="p">=</span> <span class="kc">nil</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">mysg</span><span class="p">.</span><span class="nx">g</span> <span class="p">=</span> <span class="nx">gp</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">mysg</span><span class="p">.</span><span class="nx">isSelect</span> <span class="p">=</span> <span class="kc">false</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">mysg</span><span class="p">.</span><span class="nx">c</span> <span class="p">=</span> <span class="nx">c</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">gp</span><span class="p">.</span><span class="nx">waiting</span> <span class="p">=</span> <span class="nx">mysg</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">gp</span><span class="p">.</span><span class="nx">param</span> <span class="p">=</span> <span class="kc">nil</span>
-</span></span><span class="line"><span class="cl">	<span class="c1">// 构造sudog放入发送者队列
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">c</span><span class="p">.</span><span class="nx">sendq</span><span class="p">.</span><span class="nf">enqueue</span><span class="p">(</span><span class="nx">mysg</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">atomic</span><span class="p">.</span><span class="nf">Store8</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">gp</span><span class="p">.</span><span class="nx">parkingOnChan</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="nf">gopark</span><span class="p">(</span><span class="nx">chanparkcommit</span><span class="p">,</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">c</span><span class="p">.</span><span class="nx">lock</span><span class="p">),</span> <span class="nx">waitReasonChanSend</span><span class="p">,</span> <span class="nx">traceEvGoBlockSend</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="nf">KeepAlive</span><span class="p">(</span><span class="nx">ep</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">	<span class="c1">// someone woke us up.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">if</span> <span class="nx">mysg</span> <span class="o">!=</span> <span class="nx">gp</span><span class="p">.</span><span class="nx">waiting</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;G waiting list is corrupted&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">gp</span><span class="p">.</span><span class="nx">waiting</span> <span class="p">=</span> <span class="kc">nil</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">gp</span><span class="p">.</span><span class="nx">activeStackChans</span> <span class="p">=</span> <span class="kc">false</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">closed</span> <span class="o">:=</span> <span class="p">!</span><span class="nx">mysg</span><span class="p">.</span><span class="nx">success</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">gp</span><span class="p">.</span><span class="nx">param</span> <span class="p">=</span> <span class="kc">nil</span>
-</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">mysg</span><span class="p">.</span><span class="nx">releasetime</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="nf">blockevent</span><span class="p">(</span><span class="nx">mysg</span><span class="p">.</span><span class="nx">releasetime</span><span class="o">-</span><span class="nx">t0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">mysg</span><span class="p">.</span><span class="nx">c</span> <span class="p">=</span> <span class="kc">nil</span>
-</span></span><span class="line"><span class="cl">	<span class="nf">releaseSudog</span><span class="p">(</span><span class="nx">mysg</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">closed</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nx">c</span><span class="p">.</span><span class="nx">closed</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">			<span class="nf">throw</span><span class="p">(</span><span class="s">&#34;chansend: spurious wakeup&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">		<span class="p">}</span>
-</span></span><span class="line"><span class="cl">		<span class="nb">panic</span><span class="p">(</span><span class="nf">plainError</span><span class="p">(</span><span class="s">&#34;send on closed channel&#34;</span><span class="p">))</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="kc">true</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code class="language-protobuf" data-lang="protobuf"><span class="line"><span class="cl"><span class="c1">// remote_protocol.x
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">……
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c1">// 一些常量定义和结构体定义
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">const</span> <span class="n">REMOTE_STRING_MAX</span> <span class="o">=</span> <span class="mi">4194304</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="n">typedef</span> <span class="kt">string</span> <span class="n">remote_nonnull_string</span><span class="p">&lt;</span><span class="n">REMOTE_STRING_MAX</span><span class="p">&gt;;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="n">typedef</span> <span class="n">remote_nonnull_string</span> <span class="err">*</span><span class="n">remote_string</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">……
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c1">// 请求携带的参数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">struct</span> <span class="n">remote_connect_supports_feature_args</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="n">int</span> <span class="n">feature</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">};</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c1">// 返回值携带的参数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">struct</span> <span class="n">remote_connect_supports_feature_ret</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="n">int</span> <span class="n">supported</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">};</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">……
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c1">// 远程调用方法的序号
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">enum</span> <span class="n">remote_procedure</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="n">REMOTE_PROC_CONNECT_OPEN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="n">REMOTE_PROC_CONNECT_CLOSE</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="err">……
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2perl生成代码文件">2、perl生成代码文件</h3>
+<p>src/rpc/gendispatch.pl支持生成client和server两种代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-perl" data-lang="perl"><span class="line"><span class="cl"><span class="c1"># Bodies for dispatch functions (&#34;remote_dispatch.h&#34;).</span>
+</span></span><span class="line"><span class="cl"><span class="k">elsif</span> <span class="p">(</span><span class="nv">$mode</span> <span class="ow">eq</span> <span class="s">&#34;server&#34;</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl"><span class="c1"># Bodies for client functions (&#34;remote_client_bodies.h&#34;).</span>
+</span></span><span class="line"><span class="cl"><span class="k">elsif</span> <span class="p">(</span><span class="nv">$mode</span> <span class="ow">eq</span> <span class="s">&#34;client&#34;</span><span class="p">)</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><p>send源码</p>
+</div><p>通过Makefile自动生成client和server代码</p>
+<p>src/remote/Makefile.inc.am</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -539,88 +403,101 @@
 </span><span class="lnt">25
 </span><span class="lnt">26
 </span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// send 函数处理向一个空的 channel 发送操作
-</span></span></span><span class="line"><span class="cl"><span class="c1">// ep 指向被发送的元素，会被直接拷贝到接收的 goroutine
-</span></span></span><span class="line"><span class="cl"><span class="c1">// 之后，接收的 goroutine 会被唤醒
-</span></span></span><span class="line"><span class="cl"><span class="c1">// c 必须是空的（因为等待队列里有 goroutine，肯定是空的）
-</span></span></span><span class="line"><span class="cl"><span class="c1">// c 必须被上锁，发送操作执行完后，会使用 unlockf 函数解锁
-</span></span></span><span class="line"><span class="cl"><span class="c1">// sg 必须已经从等待队列里取出来了
-</span></span></span><span class="line"><span class="cl"><span class="c1">// ep 必须是非空，并且它指向堆或调用者的栈
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">send</span><span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">hchan</span><span class="p">,</span> <span class="nx">sg</span> <span class="o">*</span><span class="nx">sudog</span><span class="p">,</span> <span class="nx">ep</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span><span class="p">,</span> <span class="nx">unlockf</span> <span class="kd">func</span><span class="p">(),</span> <span class="nx">skip</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// 省略一些用不到的
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// ……
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// sg.elem 指向接收到的值存放的位置，如 val &lt;- ch，指的就是 &amp;val
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">sg</span><span class="p">.</span><span class="nx">elem</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="c1">// 直接拷贝内存（从发送者到接收者）
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">sendDirect</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">elemtype</span><span class="p">,</span> <span class="nx">sg</span><span class="p">,</span> <span class="nx">ep</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">sg</span><span class="p">.</span><span class="nx">elem</span> <span class="p">=</span> <span class="kc">nil</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// sudog 上绑定的 goroutine
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">gp</span> <span class="o">:=</span> <span class="nx">sg</span><span class="p">.</span><span class="nx">g</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// 解锁
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">unlockf</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">gp</span><span class="p">.</span><span class="nx">param</span> <span class="p">=</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">sg</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">sg</span><span class="p">.</span><span class="nx">releasetime</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">sg</span><span class="p">.</span><span class="nx">releasetime</span> <span class="p">=</span> <span class="nf">cputicks</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// 唤醒接收的 goroutine. skip 和打印栈相关，暂时不理会
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">goready</span><span class="p">(</span><span class="nx">gp</span><span class="p">,</span> <span class="nx">skip</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code class="language-makefile" data-lang="makefile"><span class="line"><span class="cl"><span class="nf">remote/remote_client_bodies.h</span><span class="o">:</span> <span class="k">$(</span><span class="nv">srcdir</span><span class="k">)</span>/<span class="n">rpc</span>/<span class="n">gendispatch</span>.<span class="n">pl</span> \
+</span></span><span class="line"><span class="cl">		<span class="k">$(</span><span class="nv">REMOTE_PROTOCOL</span><span class="k">)</span> <span class="n">Makefile</span>.<span class="n">am</span>
+</span></span><span class="line"><span class="cl">	<span class="k">$(</span>AM_V_GEN<span class="k">)$(</span>PERL<span class="k">)</span> -w <span class="k">$(</span>srcdir<span class="k">)</span>/rpc/gendispatch.pl --mode<span class="o">=</span>client <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	  remote REMOTE <span class="k">$(</span>REMOTE_PROTOCOL<span class="k">)</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	  &gt; remote/remote_client_bodies.h
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nf">remote/lxc_client_bodies.h</span><span class="o">:</span> <span class="k">$(</span><span class="nv">srcdir</span><span class="k">)</span>/<span class="n">rpc</span>/<span class="n">gendispatch</span>.<span class="n">pl</span> \
+</span></span><span class="line"><span class="cl">		<span class="k">$(</span><span class="nv">LXC_PROTOCOL</span><span class="k">)</span> <span class="n">Makefile</span>.<span class="n">am</span>
+</span></span><span class="line"><span class="cl">	<span class="k">$(</span>AM_V_GEN<span class="k">)$(</span>PERL<span class="k">)</span> -w <span class="k">$(</span>srcdir<span class="k">)</span>/rpc/gendispatch.pl --mode<span class="o">=</span>client <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	  lxc LXC <span class="k">$(</span>LXC_PROTOCOL<span class="k">)</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	  &gt; remote/lxc_client_bodies.h
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nf">remote/qemu_client_bodies.h</span><span class="o">:</span> <span class="k">$(</span><span class="nv">srcdir</span><span class="k">)</span>/<span class="n">rpc</span>/<span class="n">gendispatch</span>.<span class="n">pl</span> \
+</span></span><span class="line"><span class="cl">		<span class="k">$(</span><span class="nv">QEMU_PROTOCOL</span><span class="k">)</span> <span class="n">Makefile</span>.<span class="n">am</span>
+</span></span><span class="line"><span class="cl">	<span class="k">$(</span>AM_V_GEN<span class="k">)$(</span>PERL<span class="k">)</span> -w <span class="k">$(</span>srcdir<span class="k">)</span>/rpc/gendispatch.pl --mode<span class="o">=</span>client <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	  qemu QEMU <span class="k">$(</span>QEMU_PROTOCOL<span class="k">)</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	  &gt; remote/qemu_client_bodies.h
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nf">remote/remote_daemon_dispatch_stubs.h</span><span class="o">:</span> <span class="k">$(</span><span class="nv">srcdir</span><span class="k">)</span>/<span class="n">rpc</span>/<span class="n">gendispatch</span>.<span class="n">pl</span> \
+</span></span><span class="line"><span class="cl">		<span class="k">$(</span><span class="nv">REMOTE_PROTOCOL</span><span class="k">)</span> <span class="n">Makefile</span>.<span class="n">am</span>
+</span></span><span class="line"><span class="cl">	<span class="k">$(</span>AM_V_GEN<span class="k">)$(</span>PERL<span class="k">)</span> -w <span class="k">$(</span>top_srcdir<span class="k">)</span>/src/rpc/gendispatch.pl <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	  --mode<span class="o">=</span>server remote REMOTE <span class="k">$(</span>REMOTE_PROTOCOL<span class="k">)</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	  &gt; remote/remote_daemon_dispatch_stubs.h
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nf">remote/lxc_daemon_dispatch_stubs.h</span><span class="o">:</span> <span class="k">$(</span><span class="nv">srcdir</span><span class="k">)</span>/<span class="n">rpc</span>/<span class="n">gendispatch</span>.<span class="n">pl</span> \
+</span></span><span class="line"><span class="cl">		<span class="k">$(</span><span class="nv">LXC_PROTOCOL</span><span class="k">)</span> <span class="n">Makefile</span>.<span class="n">am</span>
+</span></span><span class="line"><span class="cl">	<span class="k">$(</span>AM_V_GEN<span class="k">)$(</span>PERL<span class="k">)</span> -w <span class="k">$(</span>top_srcdir<span class="k">)</span>/src/rpc/gendispatch.pl <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	  --mode<span class="o">=</span>server lxc LXC <span class="k">$(</span>LXC_PROTOCOL<span class="k">)</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	  &gt; remote/lxc_daemon_dispatch_stubs.h
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nf">remote/qemu_daemon_dispatch_stubs.h</span><span class="o">:</span> <span class="k">$(</span><span class="nv">srcdir</span><span class="k">)</span>/<span class="n">rpc</span>/<span class="n">gendispatch</span>.<span class="n">pl</span> \
+</span></span><span class="line"><span class="cl">		<span class="k">$(</span><span class="nv">QEMU_PROTOCOL</span><span class="k">)</span> <span class="n">Makefile</span>.<span class="n">am</span>
+</span></span><span class="line"><span class="cl">	<span class="k">$(</span>AM_V_GEN<span class="k">)$(</span>PERL<span class="k">)</span> -w <span class="k">$(</span>top_srcdir<span class="k">)</span>/src/rpc/gendispatch.pl <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	  --mode<span class="o">=</span>server qemu QEMU <span class="k">$(</span>QEMU_PROTOCOL<span class="k">)</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>	  &gt; remote/qemu_daemon_dispatch_stubs.h
 </span></span></code></pre></td></tr></table>
 </div>
-</div><p>full源码</p>
+</div><p>上面可以再Makefile里面生成，自然也可以通过perl在本地生成。</p>
+<p>生成文件前需要再本地安装perl，perl安装外网可搜一篇通用安装教程。</p>
+<p>参考上面的Makefile，可以得到下面的生成命令</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">full</span><span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">hchan</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="c1">// 非缓冲chan，判断recvq为空，则认为满
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">if</span> <span class="nx">c</span><span class="p">.</span><span class="nx">dataqsiz</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="nx">c</span><span class="p">.</span><span class="nx">recvq</span><span class="p">.</span><span class="nx">first</span> <span class="o">==</span> <span class="kc">nil</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">	<span class="c1">// 缓冲chan，缓冲区数量等于chan大小
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">return</span> <span class="nx">c</span><span class="p">.</span><span class="nx">qcount</span> <span class="o">==</span> <span class="nx">c</span><span class="p">.</span><span class="nx">dataqsiz</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 生成remote_client_bodies.h文件</span>
+</span></span><span class="line"><span class="cl">perl -w gendispatch.pl --mode<span class="o">=</span>client remote REMOTE ../remote/remote_protocol.x  &gt; ../remote/remote_client_bodies.h
+</span></span><span class="line"><span class="cl"><span class="c1"># 生成lxc_client_bodies.h文件</span>
+</span></span><span class="line"><span class="cl">perl -w gendispatch.pl --mode<span class="o">=</span>client lxc LXC ../remote/lxc_protocol.x  &gt; ../remote/lxc_client_bodies.h
+</span></span><span class="line"><span class="cl"><span class="c1"># 生成qemu_client_bodies.h文件</span>
+</span></span><span class="line"><span class="cl">perl -w gendispatch.pl --mode<span class="o">=</span>client qemu QEMU ../remote/qemu_protocol.x  &gt; ../remote/qemu_client_bodies.h
+</span></span><span class="line"><span class="cl"><span class="c1"># 生成remote_daemon_dispatch_stubs.h文件</span>
+</span></span><span class="line"><span class="cl">perl -w gendispatch.pl --mode<span class="o">=</span>server remote REMOTE ../remote/remote_protocol.x  &gt; ../remote/remote_daemon_dispatch_stubs.h
+</span></span><span class="line"><span class="cl"><span class="c1"># 生成lxc_daemon_dispatch_stubs.h文件</span>
+</span></span><span class="line"><span class="cl">perl -w gendispatch.pl --mode<span class="o">=</span>server lxc LXC ../remote/lxc_protocol.x  &gt; ../remote/lxc_daemon_dispatch_stubs.h
+</span></span><span class="line"><span class="cl"><span class="c1"># 生成qemu_daemon_dispatch_stubs.h文件</span>
+</span></span><span class="line"><span class="cl">perl -w gendispatch.pl --mode<span class="o">=</span>server qemu QEMU ../remote/qemu_protocol.x  &gt; ../remote/qemu_daemon_dispatch_stubs.h
 </span></span></code></pre></td></tr></table>
 </div>
-</div><!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE5NjY0NDk2NDFdfQ==
+</div><blockquote>
+<p>Written with <a href="https://stackedit.io/">StackEdit</a>.</p>
+</blockquote>
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbLTE4MTIxMTI2OTgsMTY4NDg2NDMyMiwtMT
+QwOTM3MjUyMl19
 -->
-
             </div>
             
                 <div class="tags">
                     
                     <span class="down-type-item">
                         <div class="type-text">
-                            <a href='/tags/golang'>
-                            <i class="fa fa-tag"></i> golang
-                        </a>
-                        </div>
-                    </span>
-                    
-                    <span class="down-type-item">
-                        <div class="type-text">
-                            <a href='/tags/chan'>
-                            <i class="fa fa-tag"></i> chan
-                        </a>
-                        </div>
-                    </span>
-                    
-                    <span class="down-type-item">
-                        <div class="type-text">
-                            <a href='/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB'>
-                            <i class="fa fa-tag"></i> 源码阅读
+                            <a href='/tags/libvirt'>
+                            <i class="fa fa-tag"></i> libvirt
                         </a>
                         </div>
                     </span>
@@ -635,23 +512,13 @@ eyJoaXN0b3J5IjpbLTE5NjY0NDk2NDFdfQ==
                     
     
         
-        <a href="https://caojunsheng.github.io/posts/golang/02_chan_data_structure/" class="pre">
+        <a href="https://caojunsheng.github.io/posts/linux/gdb/" class="pre pre-last" style="text-align: center;">
             <span class="pre-icon"><i class="fa fa-hand-o-left"></i></span>
             <div class="pre-title-root">
-                <span>golang chan数据结构</span>
+                <span>gdb常用命令</span>
             </div>
         </a>
         
-
-        
-        <a href="https://caojunsheng.github.io/posts/golang/03_chan_recv/" class="next">
-            <div class="next-title-root">
-                <span>golang chan recv源码分析</span>
-            </div>
-            <span class="next-icon"><i class="fa fa-hand-o-right"></i></span>
-        </a>
-        
-
     
 
 
@@ -754,9 +621,9 @@ eyJoaXN0b3J5IjpbLTE5NjY0NDk2NDFdfQ==
     </div>
     <div class="list">
         
-            <a href="https://caojunsheng.github.io/posts/golang/05_chan_close/" class="">
+            <a href="https://caojunsheng.github.io/posts/linux/gdb/" class="">
                 
-<a href="https://caojunsheng.github.io/posts/golang/05_chan_close/">
+<a href="https://caojunsheng.github.io/posts/linux/gdb/">
     <div class="list-item">
         <div class="icon-other-root">
             
@@ -765,18 +632,18 @@ eyJoaXN0b3J5IjpbLTE5NjY0NDk2NDFdfQ==
         </div>
         <div class="list-right">
             <div class="other-title">
-                golang chan close源码分析   
+                gdb常用命令   
             </div>
-            <div class="other-summary">4、chan关闭流程 参考https://www.bookstack.cn/read/qcrao-Go</div>
-            <div class="other-date">2021年9月17日</div>
+            <div class="other-summary">相关命令： r（run）：运行 q（quit）：退出 b（break）：打断点 • b function_name • b row_num • b file_name:row_num • b row_num if condition</div>
+            <div class="other-date">2024年5月9日</div>
         </div>
     </div>
 </a>
             </a>
         
-            <a href="https://caojunsheng.github.io/posts/golang/03_chan_recv/" class="">
+            <a href="https://caojunsheng.github.io/posts/linux/rpm/" class="">
                 
-<a href="https://caojunsheng.github.io/posts/golang/03_chan_recv/">
+<a href="https://caojunsheng.github.io/posts/linux/rpm/">
     <div class="list-item">
         <div class="icon-other-root">
             
@@ -785,18 +652,18 @@ eyJoaXN0b3J5IjpbLTE5NjY0NDk2NDFdfQ==
         </div>
         <div class="list-right">
             <div class="other-title">
-                golang chan recv源码分析   
+                rpm常用命令   
             </div>
-            <div class="other-summary">2、chan读取源码分析 chan的读取源码入口是如下两个函数： 1 2 3 4 5 6 7 8 9 // 读取的数据放在el</div>
-            <div class="other-date">2021年9月17日</div>
+            <div class="other-summary">1.安装一个包 1 # rpm -ivh &lt; rpm package name&gt; 2.安装参数 &ndash;force 即使覆盖属于其它包的文件也强迫安装 &ndash;nodeps 如果该RPM包的安装</div>
+            <div class="other-date">2024年5月9日</div>
         </div>
     </div>
 </a>
             </a>
         
-            <a href="https://caojunsheng.github.io/posts/golang/02_chan_data_structure/" class="">
+            <a href="https://caojunsheng.github.io/posts/linux/common-cmd/" class="">
                 
-<a href="https://caojunsheng.github.io/posts/golang/02_chan_data_structure/">
+<a href="https://caojunsheng.github.io/posts/linux/common-cmd/">
     <div class="list-item">
         <div class="icon-other-root">
             
@@ -805,18 +672,18 @@ eyJoaXN0b3J5IjpbLTE5NjY0NDk2NDFdfQ==
         </div>
         <div class="list-right">
             <div class="other-title">
-                golang chan数据结构   
+                常用命令   
             </div>
-            <div class="other-summary">二、chan源码解读 1、chan数据结构 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 type</div>
-            <div class="other-date">2021年9月17日</div>
+            <div class="other-summary">1、rpm文件解压命令 1 rpm2cpio filename | cpio -div 2、yum一次性删除多个rpm包 yum list --installed|grep xxx|awk '{print $1}'|xargs yum remove -y 3、批量解压当前</div>
+            <div class="other-date">2024年5月8日</div>
         </div>
     </div>
 </a>
             </a>
         
-            <a href="https://caojunsheng.github.io/posts/golang/01_chan/" class="">
+            <a href="https://caojunsheng.github.io/posts/virtual/qemu-qom/" class="">
                 
-<a href="https://caojunsheng.github.io/posts/golang/01_chan/">
+<a href="https://caojunsheng.github.io/posts/virtual/qemu-qom/">
     <div class="list-item">
         <div class="icon-other-root">
             
@@ -825,18 +692,18 @@ eyJoaXN0b3J5IjpbLTE5NjY0NDk2NDFdfQ==
         </div>
         <div class="list-right">
             <div class="other-title">
-                golang里面几个chan常见的坑   
+                qemu QOM代码   
             </div>
-            <div class="other-summary">一、golang里面几个chan常见的坑 1、向chan发送数据 向已关闭的chan发送数据会panic</div>
-            <div class="other-date">2021年9月17日</div>
+            <div class="other-summary">QEMU提供了一套面向对象编程的模型——QOM，即QEMU Object Model，几乎所有的设备如CPU、内存</div>
+            <div class="other-date">2024年5月8日</div>
         </div>
     </div>
 </a>
             </a>
         
-            <a href="https://caojunsheng.github.io/posts/golang/07_goinline/" class="">
+            <a href="https://caojunsheng.github.io/posts/linux/pcie-aer/" class="">
                 
-<a href="https://caojunsheng.github.io/posts/golang/07_goinline/">
+<a href="https://caojunsheng.github.io/posts/linux/pcie-aer/">
     <div class="list-item">
         <div class="icon-other-root">
             
@@ -845,10 +712,10 @@ eyJoaXN0b3J5IjpbLTE5NjY0NDk2NDFdfQ==
         </div>
         <div class="list-right">
             <div class="other-title">
-                golang内联判断   
+                PCIe AER寄存器值查看和修改   
             </div>
-            <div class="other-summary">一、什么是函数内联 内联优化是什么？ 内联(inlining)是编程语言编译器常用的优化手段，其优化的对</div>
-            <div class="other-date">2023年1月14日</div>
+            <div class="other-summary">1、AER简介 AER 即 Advanced Error Reporting高级错误报告，是PCIe高级特性，用于报告PCIe 错误信息。</div>
+            <div class="other-date">2024年5月8日</div>
         </div>
     </div>
 </a>
