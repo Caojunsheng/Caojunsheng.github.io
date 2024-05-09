@@ -2,22 +2,19 @@
 <html><head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Chenruohan个人博客 | qemu QOM代码</title>
-    <meta name="description" content="qemu QOM ">
-    <link rel="canonical" href="https://caojunsheng.github.io/posts/virtual/qemu-qom/" />
+    <title>Chenruohan个人博客 | rpm</title>
+    <meta name="description" content=" ">
+    <link rel="canonical" href="https://caojunsheng.github.io/tags/rpm/" />
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
-    <meta property="og:title" content="qemu QOM代码" />
-<meta property="og:description" content="qemu QOM" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://caojunsheng.github.io/posts/virtual/qemu-qom/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2024-05-08T16:59:28+08:00" />
-<meta property="article:modified_time" content="2024-05-08T17:18:03+08:00" />
-
+    <meta property="og:title" content="rpm" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://caojunsheng.github.io/tags/rpm/" />
 
 
     <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="qemu QOM代码"/>
-<meta name="twitter:description" content="qemu QOM"/>
+<meta name="twitter:title" content="rpm"/>
+<meta name="twitter:description" content=""/>
 
     
         
@@ -219,11 +216,16 @@
 </header>
 
         <div id="content">
+    
 
 
 
 
 
+
+    
+        
+    
 
 
 
@@ -231,37 +233,17 @@
     <div class="hero">
         
         
-            <div class="hero-img">
-                <img src="/images/default.jpeg" alt="">
-            </div>
-        
+            
+                <div class="hero-img">
+                    <img src="/images/default.jpeg" alt="">
+                </div>
+            
         <div class="hero-content">
             
-            <div class="hero-title">qemu QOM代码</div>
-            <div class="hero-subtitle"></div>
-            
-            <div class="hero-date">
-                
-                
-                    <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2024-5-8 &nbsp;</span>
-                    <span class="no-wrap"><i class="fa fa-calendar-check-o"></i> 更新于: 2024-5-8 &nbsp;</span>
-                    <span class="no-wrap"><i class="fa fa-folder"></i>
-                        收录于:
-                        
-                            <a href='/categories/qemu'>
-                                qemu
-                            </a>
-                    </span>    
-                
-            </div>
-            <div class="timelong">
-                
-                <span class="no-wrap"><i class="fa fa-pencil"></i> 本文字数: 2901 &nbsp;</span>
-                <span class="no-wrap"><i class="fa fa-clock-o"></i> 阅读时长: 6 分钟 &nbsp;</span>
-                <span class="no-wrap"><i class="fa fa-eye"></i> 阅读量: <span id="busuanzi_value_page_pv"></span></span>
-            </div>
+            <h1 class="hero-title">标签：rpm</h1>
         </div>
     </div>
+
 
 
 
@@ -272,14 +254,13 @@
             
             <div class="zhuti-l">
                 
-                
 
 
 
     
 
 
-<div class="content-root">
+<div class="terms-body">
     <div class="long">
         
         <button class="tosides-1 text-wbd">
@@ -294,728 +275,74 @@
     </div>
     
         
-        <div class="content">
-            <div class="content-self">
-                <p>QEMU提供了一套面向对象编程的模型——QOM，即QEMU Object Model，几乎所有的设备如CPU、内存、总线等都是利用这一面向对象的模型来实现的。</p>
-<p>QOM模型的实现代码位于qom/文件夹下的文件中，这涉及了几个结构TypeImpl, ObjectClass, Object和TypeInfo。它们的定义都在<code>include/qom/object.h</code>可以找到，只有TypeImpl的具体结构是在<code>qom/object.c</code>中。</p>
-<blockquote>
-<p>下面代码流程都是根据qemu-4.1.0代码写的，与最新的qemu代码结构差不多，部分可能存在差异。</p>
-</blockquote>
-<h3 id="1各模块初始化函数注册typeinfo转为typeimpl">1、各模块初始化函数注册，TypeInfo转为TypeImpl</h3>
-<p>attribute属性constructor即构造函数属性，该属性的设置使得该函数在main函数之前被执行，所以qemu中会先执行调用module_init的方法，调用module_init的一些方法block_init、opts_init、type_init、trace_init、xen_backend_init、libqos_init会先于main函数执行。</p>
-<p><a href="https://www.jianshu.com/p/dd425b9dc9db"><code>__attrivbute__((constructor))用法</code></a></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#define module_init(function, type)                                         \
-</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="c1">// __attrivbute__((constructor))属性的函数为构造函数，先于main函数执行
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">static</span> <span class="kt">void</span> <span class="nf">__attribute__</span><span class="p">((</span><span class="n">constructor</span><span class="p">))</span> <span class="n">do_qemu_init_</span> <span class="err">##</span> <span class="nf">function</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>    \
-</span></span><span class="line"><span class="cl"><span class="p">{</span>                                                                           \
-</span></span><span class="line"><span class="cl">    <span class="nf">register_module_init</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">type</span><span class="p">);</span>                                   \
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">enum</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="n">MODULE_INIT_BLOCK</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="n">MODULE_INIT_OPTS</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="n">MODULE_INIT_QOM</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="n">MODULE_INIT_TRACE</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="n">MODULE_INIT_XEN_BACKEND</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="n">MODULE_INIT_LIBQOS</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="n">MODULE_INIT_MAX</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">module_init_type</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="n">ModuleTypeList</span> <span class="n">init_type_list</span><span class="p">[</span><span class="n">MODULE_INIT_MAX</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="n">ModuleTypeList</span> <span class="o">*</span><span class="nf">find_type</span><span class="p">(</span><span class="n">module_init_type</span> <span class="n">type</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nf">init_lists</span><span class="p">();</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="n">init_type_list</span><span class="p">[</span><span class="n">type</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// 注册各模块到init_type_list中，每个模块有个链表
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">register_module_init</span><span class="p">(</span><span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">fn</span><span class="p">)(</span><span class="kt">void</span><span class="p">),</span> <span class="n">module_init_type</span> <span class="n">type</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="n">ModuleEntry</span> <span class="o">*</span><span class="n">e</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="n">ModuleTypeList</span> <span class="o">*</span><span class="n">l</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="n">e</span> <span class="o">=</span> <span class="nf">g_malloc0</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">e</span><span class="p">));</span>
-</span></span><span class="line"><span class="cl">    <span class="n">e</span><span class="o">-&gt;</span><span class="n">init</span> <span class="o">=</span> <span class="n">fn</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="n">e</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">=</span> <span class="n">type</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="n">e</span><span class="o">-&gt;</span><span class="n">initialized</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="n">l</span> <span class="o">=</span> <span class="nf">find_type</span><span class="p">(</span><span class="n">type</span><span class="p">);</span> <span class="c1">// 根据类型找到ModuleTypeList列表
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
-</span></span><span class="line"><span class="cl">    <span class="nf">QTAILQ_INSERT_TAIL</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">node</span><span class="p">);</span> <span class="c1">// 将注册的各初始化方法放入列表末尾
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// 每个模块封装成不同的方法
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define block_init(function) module_init(function, MODULE_INIT_BLOCK)
-</span></span></span><span class="line"><span class="cl"><span class="cp">#define opts_init(function) module_init(function, MODULE_INIT_OPTS)
-</span></span></span><span class="line"><span class="cl"><span class="cp">#define type_init(function) module_init(function, MODULE_INIT_QOM)
-</span></span></span><span class="line"><span class="cl"><span class="cp">#define trace_init(function) module_init(function, MODULE_INIT_TRACE)
-</span></span></span><span class="line"><span class="cl"><span class="cp">#define xen_backend_init(function) module_init(function, \
-</span></span></span><span class="line"><span class="cl"><span class="cp">                                               MODULE_INIT_XEN_BACKEND)
-</span></span></span><span class="line"><span class="cl"><span class="cp">#define libqos_init(function) module_init(function, MODULE_INIT_LIBQOS)
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p>以x86 cpu的注册函数为例，target/i386/cpu.c代码如下：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="k">const</span> <span class="n">TypeInfo</span> <span class="n">x86_cpu_type_info</span> <span class="o">=</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">TYPE_X86_CPU</span><span class="p">,</span> <span class="c1">// 最终qom/object.c中type_table这个HashTable的key值
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">TYPE_CPU</span><span class="p">,</span> <span class="c1">// TYPE_X86_CPU的父对象为TYPE_CPU
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">.</span><span class="n">instance_size</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">X86CPU</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">    <span class="p">.</span><span class="n">instance_init</span> <span class="o">=</span> <span class="n">x86_cpu_initfn</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="p">.</span><span class="n">abstract</span> <span class="o">=</span> <span class="nb">true</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="p">.</span><span class="n">class_size</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">X86CPUClass</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">    <span class="p">.</span><span class="n">class_init</span> <span class="o">=</span> <span class="n">x86_cpu_common_class_init</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl"><span class="p">};</span>
-</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="k">const</span> <span class="n">TypeInfo</span> <span class="n">x86_base_cpu_type_info</span> <span class="o">=</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="nf">X86_CPU_TYPE_NAME</span><span class="p">(</span><span class="s">&#34;base&#34;</span><span class="p">),</span> <span class="c1">// 最终qom/object.c中type_table这个HashTable的key值
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="p">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">TYPE_X86_CPU</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">        <span class="p">.</span><span class="n">class_init</span> <span class="o">=</span> <span class="n">x86_cpu_base_class_init</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl"><span class="p">};</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">void</span> <span class="nf">x86_cpu_register_types</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="nf">type_register_static</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x86_cpu_type_info</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nf">ARRAY_SIZE</span><span class="p">(</span><span class="n">builtin_x86_defs</span><span class="p">);</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="nf">x86_register_cpudef_types</span><span class="p">(</span><span class="o">&amp;</span><span class="n">builtin_x86_defs</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="nf">type_register_static</span><span class="p">(</span><span class="o">&amp;</span><span class="n">max_x86_cpu_type_info</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="nf">type_register_static</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x86_base_cpu_type_info</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="cp">#if defined(CONFIG_KVM) || defined(CONFIG_HVF)
-</span></span></span><span class="line"><span class="cl"><span class="cp"></span>    <span class="nf">type_register_static</span><span class="p">(</span><span class="o">&amp;</span><span class="n">microvm_x86_cpu_type_info</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="nf">type_register_static</span><span class="p">(</span><span class="o">&amp;</span><span class="n">host_x86_cpu_type_info</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="cp">#endif
-</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="c1">// 这里调用type_init，就会相当于构造函数，先于main函数注册
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">type_init</span><span class="p">(</span><span class="n">x86_cpu_register_types</span><span class="p">)</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>将TypeInfo转换为TypeImpl，插入到HashTable type_table里
-qom/object.c</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span><span class="lnt">44
-</span><span class="lnt">45
-</span><span class="lnt">46
-</span><span class="lnt">47
-</span><span class="lnt">48
-</span><span class="lnt">49
-</span><span class="lnt">50
-</span><span class="lnt">51
-</span><span class="lnt">52
-</span><span class="lnt">53
-</span><span class="lnt">54
-</span><span class="lnt">55
-</span><span class="lnt">56
-</span><span class="lnt">57
-</span><span class="lnt">58
-</span><span class="lnt">59
-</span><span class="lnt">60
-</span><span class="lnt">61
-</span><span class="lnt">62
-</span><span class="lnt">63
-</span><span class="lnt">64
-</span><span class="lnt">65
-</span><span class="lnt">66
-</span><span class="lnt">67
-</span><span class="lnt">68
-</span><span class="lnt">69
-</span><span class="lnt">70
-</span><span class="lnt">71
-</span><span class="lnt">72
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// 获取type_table，如果未初始化，调用g_hash_table_new初始化一个新的type_table
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">static</span> <span class="n">GHashTable</span> <span class="o">*</span><span class="nf">type_table_get</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="n">GHashTable</span> <span class="o">*</span><span class="n">type_table</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// static函数和变量，type_table相当于全局变量，仅初始化一次
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">type_table</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="n">type_table</span> <span class="o">=</span> <span class="nf">g_hash_table_new</span><span class="p">(</span><span class="n">g_str_hash</span><span class="p">,</span> <span class="n">g_str_equal</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">type_table</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="c1">// 最后插入HashTable，key为TypeImpl-&gt;name,value为TypeImpl
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">static</span> <span class="kt">void</span> <span class="nf">type_table_add</span><span class="p">(</span><span class="n">TypeImpl</span> <span class="o">*</span><span class="n">ti</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nf">assert</span><span class="p">(</span><span class="o">!</span><span class="n">enumerating_types</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="nf">g_hash_table_insert</span><span class="p">(</span><span class="nf">type_table_get</span><span class="p">(),</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">ti</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span> <span class="n">ti</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="c1">// TypeInfo转换为TypeImpl
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">static</span> <span class="n">TypeImpl</span> <span class="o">*</span><span class="nf">type_new</span><span class="p">(</span><span class="k">const</span> <span class="n">TypeInfo</span> <span class="o">*</span><span class="n">info</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="n">TypeImpl</span> <span class="o">*</span><span class="n">ti</span> <span class="o">=</span> <span class="nf">g_malloc0</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">ti</span><span class="p">));</span>
-</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="nf">g_assert</span><span class="p">(</span><span class="n">info</span><span class="o">-&gt;</span><span class="n">name</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nf">type_table_lookup</span><span class="p">(</span><span class="n">info</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="nf">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&#34;Registering `%s&#39; which already exists</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">info</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">        <span class="nf">abort</span><span class="p">();</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="n">ti</span><span class="o">-&gt;</span><span class="n">name</span> <span class="o">=</span> <span class="nf">g_strdup</span><span class="p">(</span><span class="n">info</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="n">ti</span><span class="o">-&gt;</span><span class="n">parent</span> <span class="o">=</span> <span class="nf">g_strdup</span><span class="p">(</span><span class="n">info</span><span class="o">-&gt;</span><span class="n">parent</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="n">ti</span><span class="o">-&gt;</span><span class="n">class_size</span> <span class="o">=</span> <span class="n">info</span><span class="o">-&gt;</span><span class="n">class_size</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="n">ti</span><span class="o">-&gt;</span><span class="n">instance_size</span> <span class="o">=</span> <span class="n">info</span><span class="o">-&gt;</span><span class="n">instance_size</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="n">ti</span><span class="o">-&gt;</span><span class="n">class_init</span> <span class="o">=</span> <span class="n">info</span><span class="o">-&gt;</span><span class="n">class_init</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="n">ti</span><span class="o">-&gt;</span><span class="n">class_base_init</span> <span class="o">=</span> <span class="n">info</span><span class="o">-&gt;</span><span class="n">class_base_init</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="n">ti</span><span class="o">-&gt;</span><span class="n">class_data</span> <span class="o">=</span> <span class="n">info</span><span class="o">-&gt;</span><span class="n">class_data</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="n">ti</span><span class="o">-&gt;</span><span class="n">instance_init</span> <span class="o">=</span> <span class="n">info</span><span class="o">-&gt;</span><span class="n">instance_init</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="n">ti</span><span class="o">-&gt;</span><span class="n">instance_post_init</span> <span class="o">=</span> <span class="n">info</span><span class="o">-&gt;</span><span class="n">instance_post_init</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="n">ti</span><span class="o">-&gt;</span><span class="n">instance_finalize</span> <span class="o">=</span> <span class="n">info</span><span class="o">-&gt;</span><span class="n">instance_finalize</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="n">ti</span><span class="o">-&gt;</span><span class="n">abstract</span> <span class="o">=</span> <span class="n">info</span><span class="o">-&gt;</span><span class="n">abstract</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">info</span><span class="o">-&gt;</span><span class="n">interfaces</span> <span class="o">&amp;&amp;</span> <span class="n">info</span><span class="o">-&gt;</span><span class="n">interfaces</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">type</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="n">ti</span><span class="o">-&gt;</span><span class="n">interfaces</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="kr">typename</span> <span class="o">=</span> <span class="nf">g_strdup</span><span class="p">(</span><span class="n">info</span><span class="o">-&gt;</span><span class="n">interfaces</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">type</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="n">ti</span><span class="o">-&gt;</span><span class="n">num_interfaces</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">ti</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="n">TypeImpl</span> <span class="o">*</span><span class="nf">type_register_internal</span><span class="p">(</span><span class="k">const</span> <span class="n">TypeInfo</span> <span class="o">*</span><span class="n">info</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="n">TypeImpl</span> <span class="o">*</span><span class="n">ti</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="n">ti</span> <span class="o">=</span> <span class="nf">type_new</span><span class="p">(</span><span class="n">info</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="nf">type_table_add</span><span class="p">(</span><span class="n">ti</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">ti</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">TypeImpl</span> <span class="o">*</span><span class="nf">type_register</span><span class="p">(</span><span class="k">const</span> <span class="n">TypeInfo</span> <span class="o">*</span><span class="n">info</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nf">assert</span><span class="p">(</span><span class="n">info</span><span class="o">-&gt;</span><span class="n">parent</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nf">type_register_internal</span><span class="p">(</span><span class="n">info</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">TypeImpl</span> <span class="o">*</span><span class="nf">type_register_static</span><span class="p">(</span><span class="k">const</span> <span class="n">TypeInfo</span> <span class="o">*</span><span class="n">info</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nf">type_register</span><span class="p">(</span><span class="n">info</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="2各模块初始化">2、各模块初始化</h3>
-<p>vl.c的main函数中调用各模块初始化</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">envp</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="err">……</span>
-</span></span><span class="line"><span class="cl">    <span class="nf">module_call_init</span><span class="p">(</span><span class="n">MODULE_INIT_TRACE</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="nf">module_call_init</span><span class="p">(</span><span class="n">MODULE_INIT_QOM</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="nf">module_call_init</span><span class="p">(</span><span class="n">MODULE_INIT_OPTS</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="err">……</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">module_call_init</span><span class="p">(</span><span class="n">module_init_type</span> <span class="n">type</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="n">ModuleTypeList</span> <span class="o">*</span><span class="n">l</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="n">ModuleEntry</span> <span class="o">*</span><span class="n">e</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="n">l</span> <span class="o">=</span> <span class="nf">find_type</span><span class="p">(</span><span class="n">type</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="nf">QTAILQ_FOREACH</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">e</span><span class="o">-&gt;</span><span class="n">initialized</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="n">e</span><span class="o">-&gt;</span><span class="nf">init</span><span class="p">();</span> <span class="c1">// 此处对比上面例子，相当于调用x86_cpu_register_types函数，注册TYPE_X86_CPU类型的初始化函数
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">e</span><span class="o">-&gt;</span><span class="n">initialized</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span> <span class="c1">// 设置标志位initialized，不会重复初始化
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="3objectclass初始化">3、ObjectClass初始化</h3>
-<p>以 select_machine为例看下QOM初始化流程
-main-&gt;select_machine-&gt;object_class_get_list-&gt;object_class_foreach-&gt;type_table_get;object_class_foreach_tramp-&gt;type_initialize-&gt;class_base_init;class_init</p>
-<p><code>vl.c</code>中main函数调用select_machine</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">machine_class</span> <span class="o">=</span> <span class="nf">select_machine</span><span class="p">();</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="n">MachineClass</span> <span class="o">*</span><span class="nf">select_machine</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="n">GSList</span> <span class="o">*</span><span class="n">machines</span> <span class="o">=</span> <span class="nf">object_class_get_list</span><span class="p">(</span><span class="n">TYPE_MACHINE</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="n">MachineClass</span> <span class="o">*</span><span class="n">machine_class</span> <span class="o">=</span> <span class="nf">find_default_machine</span><span class="p">(</span><span class="n">machines</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="err">……</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><code>qom/object.c</code></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span><span class="lnt">44
-</span><span class="lnt">45
-</span><span class="lnt">46
-</span><span class="lnt">47
-</span><span class="lnt">48
-</span><span class="lnt">49
-</span><span class="lnt">50
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">void</span> <span class="nf">object_class_get_list_tramp</span><span class="p">(</span><span class="n">ObjectClass</span> <span class="o">*</span><span class="n">klass</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">opaque</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="n">GSList</span> <span class="o">**</span><span class="n">list</span> <span class="o">=</span> <span class="n">opaque</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// g_slist_prepend(*list, klass);是将klass插入到*list的开头的地方
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="o">*</span><span class="n">list</span> <span class="o">=</span> <span class="nf">g_slist_prepend</span><span class="p">(</span><span class="o">*</span><span class="n">list</span><span class="p">,</span> <span class="n">klass</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// 根据传入的类型TYPE_MACHINE获取对应的ObjectClass
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">GSList</span> <span class="o">*</span><span class="nf">object_class_get_list</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">implements_type</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">                              <span class="kt">bool</span> <span class="n">include_abstract</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="n">GSList</span> <span class="o">*</span><span class="n">list</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="nf">object_class_foreach</span><span class="p">(</span><span class="n">object_class_get_list_tramp</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">                         <span class="n">implements_type</span><span class="p">,</span> <span class="n">include_abstract</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">list</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">list</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">object_class_foreach</span><span class="p">(</span><span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">fn</span><span class="p">)(</span><span class="n">ObjectClass</span> <span class="o">*</span><span class="n">klass</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">opaque</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">                          <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">implements_type</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">include_abstract</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">                          <span class="kt">void</span> <span class="o">*</span><span class="n">opaque</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="n">OCFData</span> <span class="n">data</span> <span class="o">=</span> <span class="p">{</span> <span class="n">fn</span><span class="p">,</span> <span class="n">implements_type</span><span class="p">,</span> <span class="n">include_abstract</span><span class="p">,</span> <span class="n">opaque</span> <span class="p">};</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="n">enumerating_types</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// 从HashTable type_table中根据type类型拿到TypeImpl
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">g_hash_table_foreach</span><span class="p">(</span><span class="nf">type_table_get</span><span class="p">(),</span> <span class="n">object_class_foreach_tramp</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">data</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="n">enumerating_types</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">void</span> <span class="nf">object_class_foreach_tramp</span><span class="p">(</span><span class="n">gpointer</span> <span class="n">key</span><span class="p">,</span> <span class="n">gpointer</span> <span class="n">value</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">                                       <span class="n">gpointer</span> <span class="n">opaque</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="n">OCFData</span> <span class="o">*</span><span class="n">data</span> <span class="o">=</span> <span class="n">opaque</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="n">TypeImpl</span> <span class="o">*</span><span class="n">type</span> <span class="o">=</span> <span class="n">value</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="n">ObjectClass</span> <span class="o">*</span><span class="n">k</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// 此处调用machine类型的初始化函数
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">type_initialize</span><span class="p">(</span><span class="n">type</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="n">k</span> <span class="o">=</span> <span class="n">type</span><span class="o">-&gt;</span><span class="n">class</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">include_abstract</span> <span class="o">&amp;&amp;</span> <span class="n">type</span><span class="o">-&gt;</span><span class="n">abstract</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">implements_type</span> <span class="o">&amp;&amp;</span> 
-</span></span><span class="line"><span class="cl">        <span class="o">!</span><span class="nf">object_class_dynamic_cast</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">data</span><span class="o">-&gt;</span><span class="n">implements_type</span><span class="p">))</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// 最后调用data-&gt;fn，实际就是调用object_class_get_list_tramp函数
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">data</span><span class="o">-&gt;</span><span class="nf">fn</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">data</span><span class="o">-&gt;</span><span class="n">opaque</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">void</span> <span class="nf">type_initialize</span><span class="p">(</span><span class="n">TypeImpl</span> <span class="o">*</span><span class="n">ti</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="n">TypeImpl</span> <span class="o">*</span><span class="n">parent</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// 如果class已被初始化过，则不需要再初始化了
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">ti</span><span class="o">-&gt;</span><span class="n">class</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="n">ti</span><span class="o">-&gt;</span><span class="n">class_size</span> <span class="o">=</span> <span class="nf">type_class_get_size</span><span class="p">(</span><span class="n">ti</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="n">ti</span><span class="o">-&gt;</span><span class="n">instance_size</span> <span class="o">=</span> <span class="nf">type_object_get_size</span><span class="p">(</span><span class="n">ti</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="cm">/* Any type with zero instance_size is implicitly abstract.
-</span></span></span><span class="line"><span class="cl"><span class="cm">     * This means interface types are all abstract.
-</span></span></span><span class="line"><span class="cl"><span class="cm">     */</span>
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">ti</span><span class="o">-&gt;</span><span class="n">instance_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="n">ti</span><span class="o">-&gt;</span><span class="n">abstract</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// 中间省略……
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
-</span></span><span class="line"><span class="cl">    <span class="n">ti</span><span class="o">-&gt;</span><span class="n">class</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">=</span> <span class="n">ti</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// 如果有父对象，则先初始化父对象，递归调用初始化全部对象
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">while</span> <span class="p">(</span><span class="n">parent</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">parent</span><span class="o">-&gt;</span><span class="n">class_base_init</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="n">parent</span><span class="o">-&gt;</span><span class="nf">class_base_init</span><span class="p">(</span><span class="n">ti</span><span class="o">-&gt;</span><span class="n">class</span><span class="p">,</span> <span class="n">ti</span><span class="o">-&gt;</span><span class="n">class_data</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="n">parent</span> <span class="o">=</span> <span class="nf">type_get_parent</span><span class="p">(</span><span class="n">parent</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// 此处初始化这个ObjectClass
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">ti</span><span class="o">-&gt;</span><span class="n">class_init</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="n">ti</span><span class="o">-&gt;</span><span class="nf">class_init</span><span class="p">(</span><span class="n">ti</span><span class="o">-&gt;</span><span class="n">class</span><span class="p">,</span> <span class="n">ti</span><span class="o">-&gt;</span><span class="n">class_data</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>上面实际调用的则是TypeImpl中的class_init，这在最开始先于main函数执行的注册，实际调用的是<code>machine_class_init</code>
-hw/core/machine.c</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="k">const</span> <span class="n">TypeInfo</span> <span class="n">machine_info</span> <span class="o">=</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">TYPE_MACHINE</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="p">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">TYPE_OBJECT</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="p">.</span><span class="n">abstract</span> <span class="o">=</span> <span class="nb">true</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="p">.</span><span class="n">class_size</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">MachineClass</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">    <span class="p">.</span><span class="n">class_init</span>    <span class="o">=</span> <span class="n">machine_class_init</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="p">.</span><span class="n">class_base_init</span> <span class="o">=</span> <span class="n">machine_class_base_init</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="p">.</span><span class="n">instance_size</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">MachineState</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">    <span class="p">.</span><span class="n">instance_init</span> <span class="o">=</span> <span class="n">machine_initfn</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="p">.</span><span class="n">instance_finalize</span> <span class="o">=</span> <span class="n">machine_finalize</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl"><span class="p">};</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">void</span> <span class="nf">machine_register_types</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nf">type_register_static</span><span class="p">(</span><span class="o">&amp;</span><span class="n">machine_info</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="nf">type_init</span><span class="p">(</span><span class="n">machine_register_types</span><span class="p">)</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><blockquote>
-<p>总结一下就是：
-1、<code>__attribute__((constructor))</code>的修饰函数会先于main函数执行，type_init的参数是XXX_register_types函数指针，将函数指针传递到ModuleEntry的init函数指针，最后就是将这个ModuleEntry插入到ModuleTypeList
-2、main函数中的module_call_init(MODULE_INIT_QOM);调用了MODULE_INIT_QOM类型的ModuleTypeList中的所有ModuleEntry中的init()函数，也就是第一步type_init的第一个参数XXX_register_types函数指针
-3、然后就是XXX_register_types函数的初始化操作了，就是创建TypeImpl的哈希表
-4、ObjectClass获取的时候，会根据Type类型拿到对应的TypeImpl对象，如果class已经被初始化过，就无需初始化，未被初始化，则还是会调用TypeInfo定义的class_init函数初始化对象。</p>
-</blockquote>
-<p>推荐书籍：QEMUKVM源码解析与应用带书签.pdf 第二章QEMU基本纽件</p>
-<blockquote>
-<p>Written with <a href="https://stackedit.io/">StackEdit</a>.</p>
-</blockquote>
-<!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE2NDQ0NDcyNTldfQ==
--->
-            </div>
+        <div class="terms-row">
             
-                <div class="tags">
-                    
-                    <span class="down-type-item">
-                        <div class="type-text">
-                            <a href='/tags/qemu'>
-                            <i class="fa fa-tag"></i> qemu
-                        </a>
-                        </div>
-                    </span>
-                    
-                </div>
-            
-        </div>
-        
-            
-            
-                <div class="pre-next">
-                    
-    
-        
-        <a href="https://caojunsheng.github.io/posts/linux/pcie-aer/" class="pre">
-            <span class="pre-icon"><i class="fa fa-hand-o-left"></i></span>
-            <div class="pre-title-root">
-                <span>PCIe AER寄存器值查看和修改</span>
-            </div>
-        </a>
-        
+            <div class="terms-root">
+                
+                
+<div class="card-large">
+    <div class="card-large-img">
 
         
-        <a href="https://caojunsheng.github.io/posts/linux/common-cmd/" class="next">
-            <div class="next-title-root">
-                <span>常用命令</span>
-            </div>
-            <span class="next-icon"><i class="fa fa-hand-o-right"></i></span>
-        </a>
-        
-
-    
-
-
-                </div>
-            
-        
-
-    
-    
-</div>
-
-
-    <div class="content-last">
-        <button class="aixin content-last-item efct-button">
-            <i class="fa fa-heart"></i>
-        </button>
+                <img data-src="/images/default.jpeg" alt="图片加载失败" class="lazyload">
         
     </div>
+    <div class="card-large-content">
+        <div class="up-title"><a href="https://caojunsheng.github.io/posts/linux/gdb/">rpm常用命令</a></div>
+        <div class="up-date">
+            <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2024-5-9 &nbsp;</span>
+            <span class="no-wrap"><i class="fa fa-folder"></i>
+                收录于:
+                    
+                    <a href='/categories/linux'>
+                        linux
+                    </a>
+            </span>
+        </div>
+        <div class="down-summary">相关命令： r（run）：运行 q（quit）：退出 b（break）：打断点 • b function_name • b row_num • b file_name:row_num • b row_num if condition</div>
+    </div>
+    <div class="card-readmore">
+        <a href="https://caojunsheng.github.io/posts/linux/gdb/">
+            <span><i class="fa fa-arrow-right"></i></span>
+        </a>
+    </div>
+</div>
+
+
+
+    
+
+
+    <div class="down-type">
+        
+        <span class="down-type-item">
+            <div class="shuxian-root">
+                <div class="shuxian"></div>
+            </div>
+            <div class="type-text">
+                <a href='/tags/rpm'>
+                    <i class="fa fa-tag"></i> rpm
+                </a>
+            </div>
+        </span>
+        
+    </div>
+
+<div class="dang"></div>
+            </div>
+            
+        </div>
+
+    
+    
+</div>
+
 
 
             </div>
             
             <div class="zhuti-r">
+                
                 
 <div class="zhuti-r-0">
     
@@ -1083,14 +410,11 @@ eyJoaXN0b3J5IjpbLTE2NDQ0NDcyNTldfQ==
 
 
 
-    
-    
-
 
 
 <div class="other">
     <div class="other-up">
-        <div class="other-qita text-wbd">相关文章</div>
+        <div class="other-qita text-wbd">最新文章</div>
         <div class="xian"></div>
     </div>
     <div class="list">
@@ -1135,6 +459,26 @@ eyJoaXN0b3J5IjpbLTE2NDQ0NDcyNTldfQ==
 </a>
             </a>
         
+            <a href="https://caojunsheng.github.io/posts/virtual/qemu-qom/" class="">
+                
+<a href="https://caojunsheng.github.io/posts/virtual/qemu-qom/">
+    <div class="list-item">
+        <div class="icon-other-root">
+            
+                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
+            
+        </div>
+        <div class="list-right">
+            <div class="other-title">
+                qemu QOM代码   
+            </div>
+            <div class="other-summary">QEMU提供了一套面向对象编程的模型——QOM，即QEMU Object Model，几乎所有的设备如CPU、内存</div>
+            <div class="other-date">2024年5月8日</div>
+        </div>
+    </div>
+</a>
+            </a>
+        
             <a href="https://caojunsheng.github.io/posts/linux/pcie-aer/" class="">
                 
 <a href="https://caojunsheng.github.io/posts/linux/pcie-aer/">
@@ -1155,6 +499,26 @@ eyJoaXN0b3J5IjpbLTE2NDQ0NDcyNTldfQ==
 </a>
             </a>
         
+            <a href="https://caojunsheng.github.io/posts/golang/07_goinline/" class="">
+                
+<a href="https://caojunsheng.github.io/posts/golang/07_goinline/">
+    <div class="list-item">
+        <div class="icon-other-root">
+            
+                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
+            
+        </div>
+        <div class="list-right">
+            <div class="other-title">
+                golang内联判断   
+            </div>
+            <div class="other-summary">一、什么是函数内联 内联优化是什么？ 内联(inlining)是编程语言编译器常用的优化手段，其优化的对</div>
+            <div class="other-date">2023年1月14日</div>
+        </div>
+    </div>
+</a>
+            </a>
+        
     </div>
 </div>
         </div>
@@ -1169,34 +533,6 @@ eyJoaXN0b3J5IjpbLTE2NDQ0NDcyNTldfQ==
         </div>
     </div>
 </div>
-
-
-<div class="appreciate">
-    <div class="appreciate-self">
-        <div class="appreciate-title">赞赏</div>
-        <div class="appreciate-btn">
-            
-                
-                    <div class="appre-btn-1">微信</div>
-                
-
-                
-            
-        </div>
-        
-        <div class="appreciate-img">
-            
-                
-                    <img class="appre-img-1" src="/images/appreciate/wechat.jpg" alt="">
-                
-                
-            
-        </div>
-        <div class="cancel efct-button">取消</div>
-    </div>
-</div>
-
-
 
 
         </div>
