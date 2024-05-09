@@ -9,15 +9,6 @@
     <lastBuildDate>Thu, 09 May 2024 17:05:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>rpm常用命令</title>
-      <link>https://caojunsheng.github.io/posts/linux/gdb/</link>
-      <pubDate>Thu, 09 May 2024 17:05:28 +0800</pubDate>
-      
-      <guid>https://caojunsheng.github.io/posts/linux/gdb/</guid>
-      <description>相关命令： r（run）：运行 q（quit）：退出 b（break）：打断点 • b function_name • b row_num • b file_name:row_num • b row_num if condition</description>
-    </item>
-    
-    <item>
-      <title>rpm常用命令</title>
       <link>https://caojunsheng.github.io/posts/linux/rpm/</link>
       <pubDate>Thu, 09 May 2024 17:05:28 +0800</pubDate>
       
