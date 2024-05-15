@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>PCIe on Chenruohan个人博客</title>
-    <link>https://caojunsheng.github.io/tags/pcie/</link>
-    <description>Recent content in PCIe on Chenruohan个人博客</description>
+    <title>AER on Chenruohan个人博客</title>
+    <link>https://caojunsheng.github.io/tags/aer/</link>
+    <description>Recent content in AER on Chenruohan个人博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 15 May 2024 15:59:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/tags/pcie/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 15 May 2024 15:59:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/tags/aer/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>PCIe aer-inject注入AER错误</title>
       <link>https://caojunsheng.github.io/posts/linux/aer-inject/</link>
@@ -14,15 +14,6 @@
       
       <guid>https://caojunsheng.github.io/posts/linux/aer-inject/</guid>
       <description>#1、编译出aer_inject.ko 1 2 make M=/mnt/cjs/kernel/usr/src/linux-4.19.90-vhulk2202.2.0.h1064.eulerosv2r10.aarch64/drivers/pci/pcie -C /lib/modules/4.19.90-vhulk2202.2.0.h1064.eulerosv2r10.aarch64/build/ -j10 CONFIG_PCIEAER_INJECT=m insmod aer_inject.ko 安装成功后，能够在dev设备下看到aer_</description>
-    </item>
-    
-    <item>
-      <title>PCIe AER寄存器值查看和修改</title>
-      <link>https://caojunsheng.github.io/posts/linux/pcie-aer/</link>
-      <pubDate>Wed, 08 May 2024 15:59:28 +0800</pubDate>
-      
-      <guid>https://caojunsheng.github.io/posts/linux/pcie-aer/</guid>
-      <description>1、AER简介 AER 即 Advanced Error Reporting高级错误报告，是PCIe高级特性，用于报告PCIe 错误信息。</description>
     </item>
     
   </channel>

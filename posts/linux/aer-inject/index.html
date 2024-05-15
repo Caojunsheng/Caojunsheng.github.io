@@ -2,19 +2,22 @@
 <html><head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Chenruohan个人博客 | Build Site Guide</title>
-    <meta name="description" content=" ">
-    <link rel="canonical" href="https://caojunsheng.github.io/categories/build-site-guide/" />
+    <title>Chenruohan个人博客 | PCIe aer-inject注入AER错误</title>
+    <meta name="description" content="通过aer-inject工具注入AER错误 ">
+    <link rel="canonical" href="https://caojunsheng.github.io/posts/linux/aer-inject/" />
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
-    <meta property="og:title" content="Build Site Guide" />
-<meta property="og:description" content="" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://caojunsheng.github.io/categories/build-site-guide/" />
+    <meta property="og:title" content="PCIe aer-inject注入AER错误" />
+<meta property="og:description" content="通过aer-inject工具注入AER错误" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://caojunsheng.github.io/posts/linux/aer-inject/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-05-15T15:59:28+08:00" />
+<meta property="article:modified_time" content="2024-05-15T16:50:47+08:00" />
+<meta property="og:see_also" content="https://caojunsheng.github.io/posts/linux/gdb/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/linux/rpm/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/linux/common-cmd/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/linux/pcie-aer/" />
 
 
     <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Build Site Guide"/>
-<meta name="twitter:description" content=""/>
+<meta name="twitter:title" content="PCIe aer-inject注入AER错误"/>
+<meta name="twitter:description" content="通过aer-inject工具注入AER错误"/>
 
     
         
@@ -216,16 +219,11 @@
 </header>
 
         <div id="content">
-    
 
 
 
 
 
-
-    
-        
-    
 
 
 
@@ -233,17 +231,37 @@
     <div class="hero">
         
         
-            
-                <div class="hero-img">
-                    <img src="/images/default.jpeg" alt="">
-                </div>
-            
+            <div class="hero-img">
+                <img src="/images/default.jpeg" alt="">
+            </div>
+        
         <div class="hero-content">
             
-            <h1 class="hero-title">分类：Build Site Guide</h1>
+            <div class="hero-title">PCIe aer-inject注入AER错误</div>
+            <div class="hero-subtitle"></div>
+            
+            <div class="hero-date">
+                
+                
+                    <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2024-5-15 &nbsp;</span>
+                    <span class="no-wrap"><i class="fa fa-calendar-check-o"></i> 更新于: 2024-5-15 &nbsp;</span>
+                    <span class="no-wrap"><i class="fa fa-folder"></i>
+                        收录于:
+                        
+                            <a href='/categories/linux'>
+                                linux
+                            </a>
+                    </span>    
+                
+            </div>
+            <div class="timelong">
+                
+                <span class="no-wrap"><i class="fa fa-pencil"></i> 本文字数: 381 &nbsp;</span>
+                <span class="no-wrap"><i class="fa fa-clock-o"></i> 阅读时长: 1 分钟 &nbsp;</span>
+                <span class="no-wrap"><i class="fa fa-eye"></i> 阅读量: <span id="busuanzi_value_page_pv"></span></span>
+            </div>
         </div>
     </div>
-
 
 
 
@@ -254,13 +272,14 @@
             
             <div class="zhuti-l">
                 
+                
 
 
 
     
 
 
-<div class="terms-body">
+<div class="content-root">
     <div class="long">
         
         <button class="tosides-1 text-wbd">
@@ -275,74 +294,156 @@
     </div>
     
         
-        <div class="terms-row">
+        <div class="content">
+            <div class="content-self">
+                <p>#1、编译出aer_inject.ko</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">make <span class="nv">M</span><span class="o">=</span>/mnt/cjs/kernel/usr/src/linux-4.19.90-vhulk2202.2.0.h1064.eulerosv2r10.aarch64/drivers/pci/pcie -C /lib/modules/4.19.90-vhulk2202.2.0.h1064.eulerosv2r10.aarch64/build/ -j10 <span class="nv">CONFIG_PCIEAER_INJECT</span><span class="o">=</span>m
+</span></span><span class="line"><span class="cl">insmod aer_inject.ko
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>安装成功后，能够在dev设备下看到aer_inject</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># ll /dev/aer_inject </span>
+</span></span><span class="line"><span class="cl">crw------- <span class="m">1</span> root root 10, <span class="m">51</span> May <span class="m">15</span> 10:14 /dev/aer_inject
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>2、获取aer-inject aer错误注入工具</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">git clone https://github.com/jderrick/aer-inject.git
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> aer-inject
+</span></span><span class="line"><span class="cl">make
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>3、aer错误注入
+执行下面命令注入错误，这个代表针对08:0e.0设备注入不可校正的SURPDN（Surprise Down Error）错误
+<code>./aer-inject -s 08:0e.0 examples/fatal</code></p>
+<p>examples/fatal文件</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">AER
+</span></span><span class="line"><span class="cl"><span class="c1"># PCI_ID [WWWW:]XX.YY.Z</span>
+</span></span><span class="line"><span class="cl">UNCOR_STATUS SURPDN
+</span></span><span class="line"><span class="cl">HEADER_LOG <span class="m">0</span> <span class="m">1</span> <span class="m">2</span> <span class="m">4</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>由于该设备不可校正错误掩码寄存器中将SDES置为1，所以将该错误屏蔽了，从/var/log/message中日志也可以看出。
+<img src="http://image.huawei.com/tiny-lts/v1/images/92dc466439eaff8b5599570acce3fa70_1015x154.png" alt=""></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">2024-05-15T14:57:36.877516+08:00<span class="p">|</span>warning<span class="p">|</span>kernel<span class="o">[</span>-<span class="o">]</span><span class="p">|</span><span class="o">[</span>17763.652315<span class="o">]</span> pci 0000:08:0e.0: aer_inject: The uncorrectable error<span class="o">(</span>s<span class="o">)</span> is masked by device
+</span></span><span class="line"><span class="cl">2024-05-15T14:57:36.887546+08:00<span class="p">|</span>notice<span class="p">|</span><span class="o">[</span>/bin/bash<span class="o">]</span><span class="p">|</span><span class="o">[</span>2024-05-15 14:57:36 root ./aer-inject -s 08:0e.0 examples/fatal<span class="o">]</span> <span class="k">return</span> <span class="nv">code</span><span class="o">=[</span>255<span class="o">]</span>, execute failed by <span class="o">[</span>root<span class="o">(</span><span class="nv">uid</span><span class="o">=</span>0<span class="o">)]</span> from <span class="o">[</span>pts/0 <span class="o">(</span>52.170.130.96<span class="o">)]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>通过setpci将该掩码SDES置为0，
+<code>setpci -s 08:0e.0 100+08.L=00400000</code></p>
+<p>再执行aer错误注入
+<code>./aer-inject -s 08:0e.0 examples/fatal</code>
+会发现该设备已出现错误，故障注入成功</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># lspci -vvs 08:0e.0</span>
+</span></span><span class="line"><span class="cl">08:0e.0 PCI bridge: Huawei Technologies Co., Ltd. Hi1822 Family Virtual Bridge <span class="o">(</span>rev ff<span class="o">)</span> <span class="o">(</span>prog-if ff<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	!!! Unknown header <span class="nb">type</span> 7f
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Written with <a href="https://stackedit.io/">StackEdit</a>.</p>
+</blockquote>
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbODk2NzE3NzIzXX0=
+-->
+            </div>
             
-            <div class="terms-root">
-                
-                
-<div class="card-large">
-    <div class="card-large-img">
-
-        
-                <img data-src="/images/default.jpeg" alt="图片加载失败" class="lazyload">
-        
-    </div>
-    <div class="card-large-content">
-        <div class="up-title"><a href="https://caojunsheng.github.io/posts/first-post/">First Post</a></div>
-        <div class="up-date">
-            <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2022-9-17 &nbsp;</span>
-            <span class="no-wrap"><i class="fa fa-folder"></i>
-                收录于:
+                <div class="tags">
                     
-                    <a href='/categories/build-site-guide'>
-                        Build Site Guide
-                    </a>
-            </span>
-        </div>
-        <div class="down-summary">This is My First Blog 我告诉你，出来混，有错就要认，挨打要立正。 test</div>
-    </div>
-    <div class="card-readmore">
-        <a href="https://caojunsheng.github.io/posts/first-post/">
-            <span><i class="fa fa-arrow-right"></i></span>
-        </a>
-    </div>
-</div>
-
-
-
-    
-
-
-    <div class="down-type">
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/hugo'>
-                    <i class="fa fa-tag"></i> hugo
-                </a>
-            </div>
-        </span>
-        
-    </div>
-
-<div class="dang"></div>
-            </div>
+                    <span class="down-type-item">
+                        <div class="type-text">
+                            <a href='/tags/pcie'>
+                            <i class="fa fa-tag"></i> PCIe
+                        </a>
+                        </div>
+                    </span>
+                    
+                    <span class="down-type-item">
+                        <div class="type-text">
+                            <a href='/tags/aer'>
+                            <i class="fa fa-tag"></i> AER
+                        </a>
+                        </div>
+                    </span>
+                    
+                </div>
             
         </div>
+        
+            
+            
+                <div class="pre-next">
+                    
+    
+        
+        <a href="https://caojunsheng.github.io/posts/virtual/libvirt%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81/" class="pre pre-last" style="text-align: center;">
+            <span class="pre-icon"><i class="fa fa-hand-o-left"></i></span>
+            <div class="pre-title-root">
+                <span>libvirt 生成代码</span>
+            </div>
+        </a>
+        
+    
+
+
+                </div>
+            
+        
 
     
     
 </div>
 
+
+    <div class="content-last">
+        <button class="aixin content-last-item efct-button">
+            <i class="fa fa-heart"></i>
+        </button>
+        
+    </div>
 
 
             </div>
             
             <div class="zhuti-r">
-                
                 
 <div class="zhuti-r-0">
     
@@ -410,18 +511,21 @@
 
 
 
+    
+    
+
 
 
 <div class="other">
     <div class="other-up">
-        <div class="other-qita text-wbd">最新文章</div>
+        <div class="other-qita text-wbd">相关文章</div>
         <div class="xian"></div>
     </div>
     <div class="list">
         
-            <a href="https://caojunsheng.github.io/posts/linux/aer-inject/" class="">
+            <a href="https://caojunsheng.github.io/posts/linux/pcie-aer/" class="">
                 
-<a href="https://caojunsheng.github.io/posts/linux/aer-inject/">
+<a href="https://caojunsheng.github.io/posts/linux/pcie-aer/">
     <div class="list-item">
         <div class="icon-other-root">
             
@@ -430,30 +534,10 @@
         </div>
         <div class="list-right">
             <div class="other-title">
-                PCIe aer-inject注入AER错误   
+                PCIe AER寄存器值查看和修改   
             </div>
-            <div class="other-summary">#1、编译出aer_inject.ko 1 2 make M=/mnt/cjs/kernel/usr/src/linux-4.19.90-vhulk2202.2.0.h1064.eulerosv2r10.aarch64/drivers/pci/pcie -C /lib/modules/4.19.90-vhulk2202.2.0.h1064.eulerosv2r10.aarch64/build/ -j10 CONFIG_PCIEAER_INJECT=m insmod aer_inject.ko 安装成功后，能够在dev设备下看到aer_</div>
-            <div class="other-date">2024年5月15日</div>
-        </div>
-    </div>
-</a>
-            </a>
-        
-            <a href="https://caojunsheng.github.io/posts/virtual/libvirt%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81/" class="">
-                
-<a href="https://caojunsheng.github.io/posts/virtual/libvirt%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81/">
-    <div class="list-item">
-        <div class="icon-other-root">
-            
-                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
-            
-        </div>
-        <div class="list-right">
-            <div class="other-title">
-                libvirt 生成代码   
-            </div>
-            <div class="other-summary">背景：当我们需要修改xxx_protocol.x文件新增请求参数或者返回值参数时，又或者是需要修改自</div>
-            <div class="other-date">2024年5月9日</div>
+            <div class="other-summary">1、AER简介 AER 即 Advanced Error Reporting高级错误报告，是PCIe高级特性，用于报告PCIe 错误信息。</div>
+            <div class="other-date">2024年5月8日</div>
         </div>
     </div>
 </a>
@@ -519,6 +603,26 @@
 </a>
             </a>
         
+            <a href="https://caojunsheng.github.io/posts/virtual/libvirt%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81/" class="">
+                
+<a href="https://caojunsheng.github.io/posts/virtual/libvirt%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81/">
+    <div class="list-item">
+        <div class="icon-other-root">
+            
+                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
+            
+        </div>
+        <div class="list-right">
+            <div class="other-title">
+                libvirt 生成代码   
+            </div>
+            <div class="other-summary">背景：当我们需要修改xxx_protocol.x文件新增请求参数或者返回值参数时，又或者是需要修改自</div>
+            <div class="other-date">2024年5月9日</div>
+        </div>
+    </div>
+</a>
+            </a>
+        
     </div>
 </div>
         </div>
@@ -533,6 +637,34 @@
         </div>
     </div>
 </div>
+
+
+<div class="appreciate">
+    <div class="appreciate-self">
+        <div class="appreciate-title">赞赏</div>
+        <div class="appreciate-btn">
+            
+                
+                    <div class="appre-btn-1">微信</div>
+                
+
+                
+            
+        </div>
+        
+        <div class="appreciate-img">
+            
+                
+                    <img class="appre-img-1" src="/images/appreciate/wechat.jpg" alt="">
+                
+                
+            
+        </div>
+        <div class="cancel efct-button">取消</div>
+    </div>
+</div>
+
+
 
 
         </div>

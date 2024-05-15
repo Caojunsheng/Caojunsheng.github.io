@@ -6,7 +6,16 @@
     <description>Recent content on Chenruohan个人博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 09 May 2024 17:59:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 15 May 2024 15:59:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>PCIe aer-inject注入AER错误</title>
+      <link>https://caojunsheng.github.io/posts/linux/aer-inject/</link>
+      <pubDate>Wed, 15 May 2024 15:59:28 +0800</pubDate>
+      
+      <guid>https://caojunsheng.github.io/posts/linux/aer-inject/</guid>
+      <description>#1、编译出aer_inject.ko 1 2 make M=/mnt/cjs/kernel/usr/src/linux-4.19.90-vhulk2202.2.0.h1064.eulerosv2r10.aarch64/drivers/pci/pcie -C /lib/modules/4.19.90-vhulk2202.2.0.h1064.eulerosv2r10.aarch64/build/ -j10 CONFIG_PCIEAER_INJECT=m insmod aer_inject.ko 安装成功后，能够在dev设备下看到aer_</description>
+    </item>
+    
     <item>
       <title>libvirt 生成代码</title>
       <link>https://caojunsheng.github.io/posts/virtual/libvirt%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81/</link>
