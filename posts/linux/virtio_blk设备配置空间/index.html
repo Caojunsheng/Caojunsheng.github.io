@@ -2,19 +2,22 @@
 <html><head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Chenruohan个人博客 | libvirt</title>
-    <meta name="description" content=" ">
-    <link rel="canonical" href="https://caojunsheng.github.io/categories/libvirt/" />
+    <title>Chenruohan个人博客 | Virtio PCI设备配置空间详解</title>
+    <meta name="description" content="Virtio PCI配置空间详解 ">
+    <link rel="canonical" href="https://caojunsheng.github.io/posts/linux/virtio_blk%E8%AE%BE%E5%A4%87%E9%85%8D%E7%BD%AE%E7%A9%BA%E9%97%B4/" />
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
-    <meta property="og:title" content="libvirt" />
-<meta property="og:description" content="" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://caojunsheng.github.io/categories/libvirt/" />
+    <meta property="og:title" content="Virtio PCI设备配置空间详解" />
+<meta property="og:description" content="Virtio PCI配置空间详解" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://caojunsheng.github.io/posts/linux/virtio_blk%E8%AE%BE%E5%A4%87%E9%85%8D%E7%BD%AE%E7%A9%BA%E9%97%B4/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-05-29T15:59:28+08:00" />
+<meta property="article:modified_time" content="2024-05-29T15:59:28+08:00" />
+<meta property="og:see_also" content="https://caojunsheng.github.io/posts/linux/aer-inject/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/linux/gdb/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/linux/rpm/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/linux/common-cmd/" /><meta property="og:see_also" content="https://caojunsheng.github.io/posts/linux/pcie-aer/" />
 
 
     <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="libvirt"/>
-<meta name="twitter:description" content=""/>
+<meta name="twitter:title" content="Virtio PCI设备配置空间详解"/>
+<meta name="twitter:description" content="Virtio PCI配置空间详解"/>
 
     
         
@@ -216,16 +219,11 @@
 </header>
 
         <div id="content">
-    
 
 
 
 
 
-
-    
-        
-    
 
 
 
@@ -233,17 +231,37 @@
     <div class="hero">
         
         
-            
-                <div class="hero-img">
-                    <img src="/images/default.jpeg" alt="">
-                </div>
-            
+            <div class="hero-img">
+                <img src="/images/default.jpeg" alt="">
+            </div>
+        
         <div class="hero-content">
             
-            <h1 class="hero-title">分类：libvirt</h1>
+            <div class="hero-title">Virtio PCI设备配置空间详解</div>
+            <div class="hero-subtitle"></div>
+            
+            <div class="hero-date">
+                
+                
+                    <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2024-5-29 &nbsp;</span>
+                    <span class="no-wrap"><i class="fa fa-calendar-check-o"></i> 更新于: 2024-5-29 &nbsp;</span>
+                    <span class="no-wrap"><i class="fa fa-folder"></i>
+                        收录于:
+                        
+                            <a href='/categories/linux'>
+                                linux
+                            </a>
+                    </span>    
+                
+            </div>
+            <div class="timelong">
+                
+                <span class="no-wrap"><i class="fa fa-pencil"></i> 本文字数: 1540 &nbsp;</span>
+                <span class="no-wrap"><i class="fa fa-clock-o"></i> 阅读时长: 4 分钟 &nbsp;</span>
+                <span class="no-wrap"><i class="fa fa-eye"></i> 阅读量: <span id="busuanzi_value_page_pv"></span></span>
+            </div>
         </div>
     </div>
-
 
 
 
@@ -254,13 +272,14 @@
             
             <div class="zhuti-l">
                 
+                
 
 
 
     
 
 
-<div class="terms-body">
+<div class="content-root">
     <div class="long">
         
         <button class="tosides-1 text-wbd">
@@ -275,74 +294,436 @@
     </div>
     
         
-        <div class="terms-row">
+        <div class="content">
+            <div class="content-self">
+                <p>以virtio_blk设备的配置空间为例</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span><span class="lnt">87
+</span><span class="lnt">88
+</span><span class="lnt">89
+</span><span class="lnt">90
+</span><span class="lnt">91
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># lspci -vvvvs 31:00.7</span>
+</span></span><span class="line"><span class="cl">31:00.7 Class fe01: Virtio: Virtio block device <span class="o">(</span>prog-if 30<span class="o">)</span>
+</span></span><span class="line"><span class="cl">	Subsystem: Virtio: Device <span class="m">0002</span>
+</span></span><span class="line"><span class="cl">	Physical Slot: <span class="m">2</span>
+</span></span><span class="line"><span class="cl">	Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr+ Stepping- SERR+ FastB2B- DisINTx+
+</span></span><span class="line"><span class="cl">	Status: Cap+ 66MHz- UDF- FastB2B- ParErr- <span class="nv">DEVSEL</span><span class="o">=</span>fast &gt;TAbort- &lt;TAbort- &lt;MAbort- &gt;SERR- &lt;PERR- INTx+
+</span></span><span class="line"><span class="cl">	Latency: 0, Cache Line Size: <span class="m">32</span> bytes
+</span></span><span class="line"><span class="cl">	NUMA node: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">	Region 0: Memory at 9c816000 <span class="o">(</span>32-bit, prefetchable<span class="o">)</span> <span class="o">[</span><span class="nv">size</span><span class="o">=</span>8K<span class="o">]</span>
+</span></span><span class="line"><span class="cl">	Region 1: Memory at 9c821000 <span class="o">(</span>32-bit, non-prefetchable<span class="o">)</span> <span class="o">[</span><span class="nv">size</span><span class="o">=</span>4K<span class="o">]</span>
+</span></span><span class="line"><span class="cl">	Region 2: Memory at 9c7e8000 <span class="o">(</span>32-bit, prefetchable<span class="o">)</span> <span class="o">[</span><span class="nv">size</span><span class="o">=</span>32K<span class="o">]</span>
+</span></span><span class="line"><span class="cl">	Region 3: Memory at 9c730000 <span class="o">(</span>32-bit, non-prefetchable<span class="o">)</span> <span class="o">[</span><span class="nv">size</span><span class="o">=</span>64K<span class="o">]</span>
+</span></span><span class="line"><span class="cl">	Region 4: Memory at d2ff4800000 <span class="o">(</span>64-bit, prefetchable<span class="o">)</span> <span class="o">[</span><span class="nv">size</span><span class="o">=</span>4M<span class="o">]</span>
+</span></span><span class="line"><span class="cl">	Expansion ROM at 9bf00000 <span class="o">[</span>disabled<span class="o">]</span> <span class="o">[</span><span class="nv">size</span><span class="o">=</span>1M<span class="o">]</span>
+</span></span><span class="line"><span class="cl">	Capabilities: <span class="o">[</span>40<span class="o">]</span> Express <span class="o">(</span>v2<span class="o">)</span> Endpoint, MSI <span class="m">00</span>
+</span></span><span class="line"><span class="cl">		DevCap:	MaxPayload <span class="m">512</span> bytes, PhantFunc 0, Latency L0s unlimited, L1 unlimited
+</span></span><span class="line"><span class="cl">			ExtTag+ AttnBtn- AttnInd- PwrInd- RBE+ FLReset+ SlotPowerLimit 0.000W
+</span></span><span class="line"><span class="cl">		DevCtl:	CorrErr+ NonFatalErr+ FatalErr+ UnsupReq-
+</span></span><span class="line"><span class="cl">			RlxdOrd+ ExtTag+ PhantFunc- AuxPwr- NoSnoop+ FLReset-
+</span></span><span class="line"><span class="cl">			MaxPayload <span class="m">512</span> bytes, MaxReadReq <span class="m">4096</span> bytes
+</span></span><span class="line"><span class="cl">		DevSta:	CorrErr+ NonFatalErr- FatalErr- UnsupReq+ AuxPwr- TransPend-
+</span></span><span class="line"><span class="cl">		LnkCap:	Port <span class="c1">#0, Speed 16GT/s, Width x8, ASPM not supported</span>
+</span></span><span class="line"><span class="cl">			ClockPM- Surprise- LLActRep- BwNot- ASPMOptComp+
+</span></span><span class="line"><span class="cl">		LnkCtl:	ASPM Disabled<span class="p">;</span> RCB <span class="m">64</span> bytes Disabled- CommClk-
+</span></span><span class="line"><span class="cl">			ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
+</span></span><span class="line"><span class="cl">		LnkSta:	Speed 16GT/s <span class="o">(</span>ok<span class="o">)</span>, Width x8 <span class="o">(</span>ok<span class="o">)</span>
+</span></span><span class="line"><span class="cl">			TrErr- Train- SlotClk- DLActive- BWMgmt- ABWMgmt-
+</span></span><span class="line"><span class="cl">		DevCap2: Completion Timeout: Not Supported, TimeoutDis-, NROPrPrP-, LTR-
+</span></span><span class="line"><span class="cl">			 10BitTagComp-, 10BitTagReq-, OBFF Not Supported, ExtFmt+, EETLPPrefix-
+</span></span><span class="line"><span class="cl">			 EmergencyPowerReduction Not Supported, EmergencyPowerReductionInit-
+</span></span><span class="line"><span class="cl">			 FRS-, TPHComp-, ExtTPHComp-
+</span></span><span class="line"><span class="cl">			 AtomicOpsCap: 32bit- 64bit- 128bitCAS-
+</span></span><span class="line"><span class="cl">		DevCtl2: Completion Timeout: 50us to 50ms, TimeoutDis-, LTR-, OBFF Disabled
+</span></span><span class="line"><span class="cl">			 AtomicOpsCtl: ReqEn+
+</span></span><span class="line"><span class="cl">		LnkSta2: Current De-emphasis Level: -6dB, EqualizationComplete-, EqualizationPhase1-
+</span></span><span class="line"><span class="cl">			 EqualizationPhase2-, EqualizationPhase3-, LinkEqualizationRequest-
+</span></span><span class="line"><span class="cl">	Capabilities: <span class="o">[</span>80<span class="o">]</span> MSI: Enable- <span class="nv">Count</span><span class="o">=</span>1/2 Maskable+ 64bit+
+</span></span><span class="line"><span class="cl">		Address: <span class="m">0000000000000000</span>  Data: <span class="m">0000</span>
+</span></span><span class="line"><span class="cl">		Masking: <span class="m">00000000</span>  Pending: <span class="m">00000000</span>
+</span></span><span class="line"><span class="cl">	Capabilities: <span class="o">[</span>98<span class="o">]</span> Vital Product Data
+</span></span><span class="line"><span class="cl">		Product Name:  
+</span></span><span class="line"><span class="cl">		Read-only fields:
+</span></span><span class="line"><span class="cl">			<span class="o">[</span>PN<span class="o">]</span> Part number: 970, NIC, 2X100GE
+</span></span><span class="line"><span class="cl">		End
+</span></span><span class="line"><span class="cl">	Capabilities: <span class="o">[</span>a0<span class="o">]</span> MSI-X: Enable+ <span class="nv">Count</span><span class="o">=</span><span class="m">2</span> Masked-
+</span></span><span class="line"><span class="cl">		Vector table: <span class="nv">BAR</span><span class="o">=</span><span class="m">2</span> <span class="nv">offset</span><span class="o">=</span><span class="m">00000000</span>
+</span></span><span class="line"><span class="cl">		PBA: <span class="nv">BAR</span><span class="o">=</span><span class="m">2</span> <span class="nv">offset</span><span class="o">=</span><span class="m">00004000</span>
+</span></span><span class="line"><span class="cl">	Capabilities: <span class="o">[</span>b0<span class="o">]</span> Power Management version <span class="m">3</span>
+</span></span><span class="line"><span class="cl">		Flags: PMEClk- DSI- D1- D2- <span class="nv">AuxCurrent</span><span class="o">=</span>0mA PME<span class="o">(</span>D0+,D1+,D2+,D3hot+,D3cold+<span class="o">)</span>
+</span></span><span class="line"><span class="cl">		Status: D0 NoSoftRst+ PME-Enable- <span class="nv">DSel</span><span class="o">=</span><span class="m">0</span> <span class="nv">DScale</span><span class="o">=</span><span class="m">0</span> PME-
+</span></span><span class="line"><span class="cl">	Capabilities: <span class="o">[</span>b8<span class="o">]</span> Vendor Specific Information: VirtIO: CommonCfg
+</span></span><span class="line"><span class="cl">		<span class="nv">BAR</span><span class="o">=</span><span class="m">1</span> <span class="nv">offset</span><span class="o">=</span>00000f00 <span class="nv">size</span><span class="o">=</span><span class="m">00000038</span>
+</span></span><span class="line"><span class="cl">	Capabilities: <span class="o">[</span>c8<span class="o">]</span> Vendor Specific Information: VirtIO: Notify
+</span></span><span class="line"><span class="cl">		<span class="nv">BAR</span><span class="o">=</span><span class="m">1</span> <span class="nv">offset</span><span class="o">=</span>00000ff0 <span class="nv">size</span><span class="o">=</span><span class="m">00000004</span> <span class="nv">multiplier</span><span class="o">=</span><span class="m">00000000</span>
+</span></span><span class="line"><span class="cl">	Capabilities: <span class="o">[</span>dc<span class="o">]</span> Vendor Specific Information: VirtIO: ISR
+</span></span><span class="line"><span class="cl">		<span class="nv">BAR</span><span class="o">=</span><span class="m">1</span> <span class="nv">offset</span><span class="o">=</span>00000f3c <span class="nv">size</span><span class="o">=</span><span class="m">00000004</span>
+</span></span><span class="line"><span class="cl">	Capabilities: <span class="o">[</span>ec<span class="o">]</span> Vendor Specific Information: VirtIO: DeviceCfg
+</span></span><span class="line"><span class="cl">		<span class="nv">BAR</span><span class="o">=</span><span class="m">1</span> <span class="nv">offset</span><span class="o">=</span>00000f40 <span class="nv">size</span><span class="o">=</span><span class="m">00000050</span>
+</span></span><span class="line"><span class="cl">	Capabilities: <span class="o">[</span><span class="m">100</span> v2<span class="o">]</span> Advanced Error Reporting
+</span></span><span class="line"><span class="cl">		UESta:	DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC- UnsupReq+ ACSViol-
+</span></span><span class="line"><span class="cl">		UEMsk:	DLP- SDES- TLP+ FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC- UnsupReq+ ACSViol-
+</span></span><span class="line"><span class="cl">		UESvrt:	DLP+ SDES+ TLP- FCP+ CmpltTO- CmpltAbrt- UnxCmplt- RxOF+ MalfTLP+ ECRC- UnsupReq- ACSViol-
+</span></span><span class="line"><span class="cl">		CESta:	RxErr- BadTLP- BadDLLP- Rollover- Timeout- AdvNonFatalErr+
+</span></span><span class="line"><span class="cl">		CEMsk:	RxErr- BadTLP- BadDLLP- Rollover- Timeout- AdvNonFatalErr-
+</span></span><span class="line"><span class="cl">		AERCap:	First Error Pointer: 00, ECRCGenCap+ ECRCGenEn- ECRCChkCap+ ECRCChkEn-
+</span></span><span class="line"><span class="cl">			MultHdrRecCap- MultHdrRecEn- TLPPfxPres- HdrLogCap+
+</span></span><span class="line"><span class="cl">		HeaderLog: <span class="m">00000000</span> <span class="m">00000000</span> <span class="m">00000000</span> <span class="m">00000000</span>
+</span></span><span class="line"><span class="cl">	Capabilities: <span class="o">[</span><span class="m">150</span> v1<span class="o">]</span> Alternative Routing-ID Interpretation <span class="o">(</span>ARI<span class="o">)</span>
+</span></span><span class="line"><span class="cl">		ARICap:	MFVC- ACS-, Next Function: <span class="m">8</span>
+</span></span><span class="line"><span class="cl">		ARICtl:	MFVC- ACS-, Function Group: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">	Capabilities: <span class="o">[</span><span class="m">200</span> v1<span class="o">]</span> Single Root I/O Virtualization <span class="o">(</span>SR-IOV<span class="o">)</span>
+</span></span><span class="line"><span class="cl">		IOVCap:	Migration-, Interrupt Message Number: <span class="m">000</span>
+</span></span><span class="line"><span class="cl">		IOVCtl:	Enable+ Migration- Interrupt- MSE+ ARIHierarchy-
+</span></span><span class="line"><span class="cl">		IOVSta:	Migration-
+</span></span><span class="line"><span class="cl">		Initial VFs: 255, Total VFs: 255, Number of VFs: 255, Function Dependency Link: <span class="m">07</span>
+</span></span><span class="line"><span class="cl">		VF offset: 1144, stride: 1, Device ID: <span class="m">1001</span>
+</span></span><span class="line"><span class="cl">		Supported Page Size: 00000553, System Page Size: <span class="m">00000001</span>
+</span></span><span class="line"><span class="cl">		Region 0: Memory at 00000d2ffd70c000 <span class="o">(</span>64-bit, prefetchable<span class="o">)</span>
+</span></span><span class="line"><span class="cl">		Region 2: Memory at 00000d2ff97f0000 <span class="o">(</span>64-bit, prefetchable<span class="o">)</span>
+</span></span><span class="line"><span class="cl">		Region 4: Memory at 00000d2ffd310000 <span class="o">(</span>64-bit, prefetchable<span class="o">)</span>
+</span></span><span class="line"><span class="cl">		VF Migration: offset: 00000000, BIR: <span class="m">0</span>
+</span></span><span class="line"><span class="cl">	Capabilities: <span class="o">[</span>2a0 v1<span class="o">]</span> Transaction Processing Hints
+</span></span><span class="line"><span class="cl">		Device specific mode supported
+</span></span><span class="line"><span class="cl">		No steering table available
+</span></span><span class="line"><span class="cl">	Capabilities: <span class="o">[</span>4e0 v1<span class="o">]</span> Device Serial Number ff-ff-ff-ff-ff-ff-ff-ff
+</span></span><span class="line"><span class="cl">	Capabilities: <span class="o">[</span><span class="m">630</span> v1<span class="o">]</span> Access Control Services
+</span></span><span class="line"><span class="cl">		ACSCap:	SrcValid- TransBlk- ReqRedir- CmpltRedir- UpstreamFwd- EgressCtrl- DirectTrans-
+</span></span><span class="line"><span class="cl">		ACSCtl:	SrcValid- TransBlk- ReqRedir- CmpltRedir- UpstreamFwd- EgressCtrl- DirectTrans-
+</span></span><span class="line"><span class="cl">	Capabilities: <span class="o">[</span><span class="m">700</span> v1<span class="o">]</span> Data Link Feature &lt;?&gt;
+</span></span><span class="line"><span class="cl">	Kernel driver in use: virtio-pci
+</span></span><span class="line"><span class="cl">	Kernel modules: virtio_pci
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>lspci -xxxs 31:00.7</p>
+<p>31:00.7 Class fe01: Virtio: Virtio block device</p>
+<p>00: f4 1a 01 10 46 05 18 00 00 30 01 fe 08 00 80 00</p>
+<p>10: 08 60 81 9c 00 10 82 9c 08 80 7e 9c 00 00 73 9c</p>
+<p>20: 0c 00 80 f4 2f 0d 00 00 00 00 00 00 f4 1a 02 00</p>
+<p>30: 00 00 f0 9b <span style="background-color:rgb(233,30,77)">40</span> 00 00 00 00 00 00 00 ff 00 00 00</p>
+<p>40: 10 <span style="background-color:rgb(233,30,77)">80</span> 02 00 e2 8f 00 10 57 59 09 00 84 f0 43 00</p>
+<p>50: 00 00 84 00 00 00 00 00 00 00 00 00 00 00 00 00</p>
+<p>60: 00 00 00 00 00 00 10 00 40 00 00 00 3e 3e 80 01</p>
+<p>70: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</p>
+<p>80: 05 <span style="background-color:rgb(233,30,77)">98</span> 82 01 00 00 00 00 00 00 00 00 00 00 00 00</p>
+<p>90: 00 00 00 00 00 00 00 00 03 <span style="background-color:rgb(233,30,77)">a0</span> 18 80 30 47 45 78</p>
+<p>a0: 11 <span style="background-color:rgb(233,30,77)">b0</span> 01 80 02 00 00 00 02 40 00 00 00 00 00 00</p>
+<p>b0: 01 <span style="background-color:rgb(233,30,77)">b8</span> 03 f8 08 00 00 00 09 <span style="background-color:rgb(233,30,77)">c8</span> 10 01 01 00 00 00</p>
+<p>c0: 00 0f 00 00 38 00 00 00 09 <span style="background-color:rgb(233,30,77)">dc</span> 14 02 01 00 00 00</p>
+<p>d0: f0 0f 00 00 04 00 00 00 00 00 00 00 09 <span style="background-color:rgb(233,30,77)">ec</span> 10 03</p>
+<p>e0: 01 00 00 00 3c 0f 00 00 04 00 00 00 09 00 10 04</p>
+<p>f0: 01 00 00 00 40 0f 00 00 50 00 00 00 00 00 00 00</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// PCI Capabilities ID枚举
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define  PCI_CAP_ID_PM		0x01	</span><span class="cm">/* Power Management */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define  PCI_CAP_ID_AGP		0x02	</span><span class="cm">/* Accelerated Graphics Port */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define  PCI_CAP_ID_VPD		0x03	</span><span class="cm">/* Vital Product Data */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define  PCI_CAP_ID_SLOTID	0x04	</span><span class="cm">/* Slot Identification */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define  PCI_CAP_ID_MSI		0x05	</span><span class="cm">/* Message Signalled Interrupts */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define  PCI_CAP_ID_CHSWP	0x06	</span><span class="cm">/* CompactPCI HotSwap */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define  PCI_CAP_ID_PCIX	0x07	</span><span class="cm">/* PCI-X */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define  PCI_CAP_ID_HT		0x08	</span><span class="cm">/* HyperTransport */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define  PCI_CAP_ID_VNDR	0x09	</span><span class="cm">/* Vendor-Specific */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define  PCI_CAP_ID_DBG		0x0A	</span><span class="cm">/* Debug port */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define  PCI_CAP_ID_CCRC	0x0B	</span><span class="cm">/* CompactPCI Central Resource Control */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define  PCI_CAP_ID_SHPC	0x0C	</span><span class="cm">/* PCI Standard Hot-Plug Controller */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define  PCI_CAP_ID_SSVID	0x0D	</span><span class="cm">/* Bridge subsystem vendor/device ID */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define  PCI_CAP_ID_AGP3	0x0E	</span><span class="cm">/* AGP Target PCI-PCI bridge */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define  PCI_CAP_ID_SECDEV	0x0F	</span><span class="cm">/* Secure Device */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define  PCI_CAP_ID_EXP		0x10	</span><span class="cm">/* PCI Express */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define  PCI_CAP_ID_MSIX	0x11	</span><span class="cm">/* MSI-X */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define  PCI_CAP_ID_SATA	0x12	</span><span class="cm">/* SATA Data/Index Conf. */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define  PCI_CAP_ID_AF		0x13	</span><span class="cm">/* PCI Advanced Features */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define  PCI_CAP_ID_EA		0x14	</span><span class="cm">/* PCI Enhanced Allocation */</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// virtio_pci_cap结构体定义
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">struct</span> <span class="n">virtio_pci_cap</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">__u8</span> <span class="n">cap_vndr</span><span class="p">;</span>		<span class="cm">/* Generic PCI field: PCI_CAP_ID_VNDR */</span>
+</span></span><span class="line"><span class="cl">	<span class="n">__u8</span> <span class="n">cap_next</span><span class="p">;</span>		<span class="cm">/* Generic PCI field: next ptr. */</span>
+</span></span><span class="line"><span class="cl">	<span class="n">__u8</span> <span class="n">cap_len</span><span class="p">;</span>		<span class="cm">/* Generic PCI field: capability length */</span>
+</span></span><span class="line"><span class="cl">	<span class="n">__u8</span> <span class="n">cfg_type</span><span class="p">;</span>		<span class="cm">/* Identifies the structure. */</span>
+</span></span><span class="line"><span class="cl">	<span class="n">__u8</span> <span class="n">bar</span><span class="p">;</span>		<span class="cm">/* Where to find it. */</span>
+</span></span><span class="line"><span class="cl">	<span class="n">__u8</span> <span class="n">id</span><span class="p">;</span>		<span class="cm">/* Multiple capabilities of the same type */</span>
+</span></span><span class="line"><span class="cl">	<span class="n">__u8</span> <span class="n">padding</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>	<span class="cm">/* Pad to full dword. */</span>
+</span></span><span class="line"><span class="cl">	<span class="n">__le32</span> <span class="n">offset</span><span class="p">;</span>		<span class="cm">/* Offset within bar. */</span>
+</span></span><span class="line"><span class="cl">	<span class="n">__le32</span> <span class="n">length</span><span class="p">;</span>		<span class="cm">/* Length of the structure, in bytes. */</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// cfg_type枚举类型
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cm">/* Common configuration */</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#define VIRTIO_PCI_CAP_COMMON_CFG	1
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="cm">/* Notifications */</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#define VIRTIO_PCI_CAP_NOTIFY_CFG	2
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="cm">/* ISR access */</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#define VIRTIO_PCI_CAP_ISR_CFG		3
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="cm">/* Device specific configuration */</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#define VIRTIO_PCI_CAP_DEVICE_CFG	4
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="cm">/* PCI configuration access */</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#define VIRTIO_PCI_CAP_PCI_CFG		5
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="cm">/* Additional shared memory capability */</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#define VIRTIO_PCI_CAP_SHARED_MEMORY_CFG 8
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>以c8起始的Capabilities为例，逐个解析</p>
+<p>Capabilities: [c8] Vendor Specific Information: VirtIO: Notify</p>
+<p>BAR=1 offset=00000ff0 size=00000004 multiplier=00000000</p>
+<p>c0: 00 0f 00 00 38 00 00 00 <span style="background-color:rgb(233,30,77)">09 dc 14 02 01 00 00 00</span>
+d0: <span style="background-color:rgb(233,30,77)">f0 0f 00 00 04 00 00 00</span> 00 00 00 00 09 ec 10 03</p>
+<table>
+<thead>
+<tr>
+<th>配置空间值</th>
+<th>对应字段</th>
+<th>实际含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>09</td>
+<td>__u8 cap_vndr</td>
+<td>PCI_CAP_ID_VNDR：Vendor-Specific</td>
+</tr>
+<tr>
+<td>dc</td>
+<td>__u8 cap_next</td>
+<td>指向下一个指针起始位置</td>
+</tr>
+<tr>
+<td>14</td>
+<td>__u8 cap_len</td>
+<td>Capabilities长度</td>
+</tr>
+<tr>
+<td>02</td>
+<td>__u8 cfg_type</td>
+<td>VIRTIO_PCI_CAP_NOTIFY_CFG</td>
+</tr>
+<tr>
+<td>01</td>
+<td>__u8 bar</td>
+<td>BAR=1</td>
+</tr>
+<tr>
+<td>00</td>
+<td>__u8 id</td>
+<td>相同类型的Capabilities的id标识</td>
+</tr>
+<tr>
+<td>00 00</td>
+<td>__u8 padding[2]</td>
+<td></td>
+</tr>
+<tr>
+<td>f0 0f 00 00</td>
+<td>__le32 offset</td>
+<td>偏移位置</td>
+</tr>
+<tr>
+<td>04 00 00 00</td>
+<td>__le32 length</td>
+<td>大小</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Written with <a href="https://stackedit.io/">StackEdit</a>.</p>
+</blockquote>
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbLTUwMzc5MzY1LC0xNTc3NzcwMzcxXX0=
+-->
+            </div>
             
-            <div class="terms-root">
-                
-                
-<div class="card-large">
-    <div class="card-large-img">
-
-        
-                <img data-src="/images/default.jpeg" alt="图片加载失败" class="lazyload">
-        
-    </div>
-    <div class="card-large-content">
-        <div class="up-title"><a href="https://caojunsheng.github.io/posts/virtual/libvirt%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81/">libvirt 生成代码</a></div>
-        <div class="up-date">
-            <span class="no-wrap"><i class="fa fa-calendar"></i> 发布于: 2024-5-9 &nbsp;</span>
-            <span class="no-wrap"><i class="fa fa-folder"></i>
-                收录于:
+                <div class="tags">
                     
-                    <a href='/categories/libvirt'>
-                        libvirt
-                    </a>
-            </span>
-        </div>
-        <div class="down-summary">背景：当我们需要修改xxx_protocol.x文件新增请求参数或者返回值参数时，又或者是需要修改自</div>
-    </div>
-    <div class="card-readmore">
-        <a href="https://caojunsheng.github.io/posts/virtual/libvirt%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81/">
-            <span><i class="fa fa-arrow-right"></i></span>
-        </a>
-    </div>
-</div>
-
-
-
-    
-
-
-    <div class="down-type">
-        
-        <span class="down-type-item">
-            <div class="shuxian-root">
-                <div class="shuxian"></div>
-            </div>
-            <div class="type-text">
-                <a href='/tags/libvirt'>
-                    <i class="fa fa-tag"></i> libvirt
-                </a>
-            </div>
-        </span>
-        
-    </div>
-
-<div class="dang"></div>
-            </div>
+                    <span class="down-type-item">
+                        <div class="type-text">
+                            <a href='/tags/virtio'>
+                            <i class="fa fa-tag"></i> virtio
+                        </a>
+                        </div>
+                    </span>
+                    
+                </div>
             
         </div>
+        
+            
+            
+                <div class="pre-next">
+                    
+    
+        
+        <a href="https://caojunsheng.github.io/posts/linux/aer-inject/" class="pre pre-last" style="text-align: center;">
+            <span class="pre-icon"><i class="fa fa-hand-o-left"></i></span>
+            <div class="pre-title-root">
+                <span>PCIe aer-inject注入AER错误</span>
+            </div>
+        </a>
+        
+    
+
+
+                </div>
+            
+        
 
     
     
 </div>
 
+
+    <div class="content-last">
+        <button class="aixin content-last-item efct-button">
+            <i class="fa fa-heart"></i>
+        </button>
+        
+    </div>
 
 
             </div>
             
             <div class="zhuti-r">
-                
                 
 <div class="zhuti-r-0">
     
@@ -410,34 +791,17 @@
 
 
 
+    
+    
+
 
 
 <div class="other">
     <div class="other-up">
-        <div class="other-qita text-wbd">最新文章</div>
+        <div class="other-qita text-wbd">相关文章</div>
         <div class="xian"></div>
     </div>
     <div class="list">
-        
-            <a href="https://caojunsheng.github.io/posts/linux/virtio_blk%E8%AE%BE%E5%A4%87%E9%85%8D%E7%BD%AE%E7%A9%BA%E9%97%B4/" class="">
-                
-<a href="https://caojunsheng.github.io/posts/linux/virtio_blk%E8%AE%BE%E5%A4%87%E9%85%8D%E7%BD%AE%E7%A9%BA%E9%97%B4/">
-    <div class="list-item">
-        <div class="icon-other-root">
-            
-                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
-            
-        </div>
-        <div class="list-right">
-            <div class="other-title">
-                Virtio PCI设备配置空间详解   
-            </div>
-            <div class="other-summary">以virtio_blk设备的配置空间为例 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30</div>
-            <div class="other-date">2024年5月29日</div>
-        </div>
-    </div>
-</a>
-            </a>
         
             <a href="https://caojunsheng.github.io/posts/linux/aer-inject/" class="">
                 
@@ -454,26 +818,6 @@
             </div>
             <div class="other-summary">对AER注入错误需要内核模块支持注入，需要安装aer_inject.ko模块，以及需要工具aer-i</div>
             <div class="other-date">2024年5月15日</div>
-        </div>
-    </div>
-</a>
-            </a>
-        
-            <a href="https://caojunsheng.github.io/posts/virtual/libvirt%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81/" class="">
-                
-<a href="https://caojunsheng.github.io/posts/virtual/libvirt%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81/">
-    <div class="list-item">
-        <div class="icon-other-root">
-            
-                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
-            
-        </div>
-        <div class="list-right">
-            <div class="other-title">
-                libvirt 生成代码   
-            </div>
-            <div class="other-summary">背景：当我们需要修改xxx_protocol.x文件新增请求参数或者返回值参数时，又或者是需要修改自</div>
-            <div class="other-date">2024年5月9日</div>
         </div>
     </div>
 </a>
@@ -519,6 +863,46 @@
 </a>
             </a>
         
+            <a href="https://caojunsheng.github.io/posts/linux/common-cmd/" class="">
+                
+<a href="https://caojunsheng.github.io/posts/linux/common-cmd/">
+    <div class="list-item">
+        <div class="icon-other-root">
+            
+                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
+            
+        </div>
+        <div class="list-right">
+            <div class="other-title">
+                常用命令   
+            </div>
+            <div class="other-summary">1、rpm文件解压命令 1 rpm2cpio filename | cpio -div 2、yum一次性删除多个rpm包 yum list --installed|grep xxx|awk '{print $1}'|xargs yum remove -y 3、批量解压当前</div>
+            <div class="other-date">2024年5月8日</div>
+        </div>
+    </div>
+</a>
+            </a>
+        
+            <a href="https://caojunsheng.github.io/posts/linux/pcie-aer/" class="">
+                
+<a href="https://caojunsheng.github.io/posts/linux/pcie-aer/">
+    <div class="list-item">
+        <div class="icon-other-root">
+            
+                <div class="icon-other" style="background-image: url( /images/default.jpeg );"></div>
+            
+        </div>
+        <div class="list-right">
+            <div class="other-title">
+                PCIe AER寄存器值查看和修改   
+            </div>
+            <div class="other-summary">1、AER简介 AER 即 Advanced Error Reporting高级错误报告，是PCIe高级特性，用于报告PCIe 错误信息。</div>
+            <div class="other-date">2024年5月8日</div>
+        </div>
+    </div>
+</a>
+            </a>
+        
     </div>
 </div>
         </div>
@@ -533,6 +917,34 @@
         </div>
     </div>
 </div>
+
+
+<div class="appreciate">
+    <div class="appreciate-self">
+        <div class="appreciate-title">赞赏</div>
+        <div class="appreciate-btn">
+            
+                
+                    <div class="appre-btn-1">微信</div>
+                
+
+                
+            
+        </div>
+        
+        <div class="appreciate-img">
+            
+                
+                    <img class="appre-img-1" src="/images/appreciate/wechat.jpg" alt="">
+                
+                
+            
+        </div>
+        <div class="cancel efct-button">取消</div>
+    </div>
+</div>
+
+
 
 
         </div>

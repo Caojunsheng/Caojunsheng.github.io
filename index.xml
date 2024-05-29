@@ -6,7 +6,16 @@
     <description>Recent content on Chenruohan个人博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 15 May 2024 15:59:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 29 May 2024 15:59:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Virtio PCI设备配置空间详解</title>
+      <link>https://caojunsheng.github.io/posts/linux/virtio_blk%E8%AE%BE%E5%A4%87%E9%85%8D%E7%BD%AE%E7%A9%BA%E9%97%B4/</link>
+      <pubDate>Wed, 29 May 2024 15:59:28 +0800</pubDate>
+      
+      <guid>https://caojunsheng.github.io/posts/linux/virtio_blk%E8%AE%BE%E5%A4%87%E9%85%8D%E7%BD%AE%E7%A9%BA%E9%97%B4/</guid>
+      <description>以virtio_blk设备的配置空间为例 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30</description>
+    </item>
+    
     <item>
       <title>PCIe aer-inject注入AER错误</title>
       <link>https://caojunsheng.github.io/posts/linux/aer-inject/</link>
