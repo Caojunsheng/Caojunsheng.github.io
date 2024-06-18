@@ -6,7 +6,16 @@
     <description>Recent content in linux on Chenruohan个人博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 18 Jun 2024 16:20:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/categories/linux/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 18 Jun 2024 16:29:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/categories/linux/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>virtio_net设备初始化流程</title>
+      <link>https://caojunsheng.github.io/posts/linux/virtio/</link>
+      <pubDate>Tue, 18 Jun 2024 16:29:28 +0800</pubDate>
+      
+      <guid>https://caojunsheng.github.io/posts/linux/virtio/</guid>
+      <description>worker_thread &amp;ndash;&amp;gt; process_one_work &amp;ndash;&amp;gt; pciehp_power_thread &amp;ndash;&amp;gt; pciehp_ctrl.c pciehp_enable_slot &amp;ndash;&amp;gt; board_added &amp;ndash;&amp;gt; pciehp_pci.c pciehp_configure_device &amp;ndash;&amp;gt; pci/bus.c pci_bus_add_devices &amp;ndash;&amp;gt; pci_bus_add_device &amp;ndash;&amp;gt; dd.c device_attach &amp;ndash;&amp;gt; __device_attach &amp;ndash;&amp;gt; bus_for_each_drv &amp;ndash;&amp;gt; __device_attach_driver &amp;ndash;&amp;gt; driver_probe_device &amp;ndash;&amp;gt; really_probe &amp;ndash;&amp;gt;call_driver_probe &amp;ndash;&amp;gt; pci-driver.c pci_device_probe &amp;ndash;&amp;gt; pci_call_probe &amp;ndash;&amp;gt; local_pci_probe &amp;ndash;&amp;gt; virtio_pci_common.c virtio_pci_probe &amp;ndash;&amp;gt; virtio.c register_virtio_device &amp;ndash;&amp;gt; core.c device_add &amp;ndash;&amp;gt; base/bus.c</description>
+    </item>
+    
     <item>
       <title>vfio-mdev使用</title>
       <link>https://caojunsheng.github.io/posts/linux/vfio-mdev/</link>
