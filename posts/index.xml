@@ -6,7 +6,16 @@
     <description>Recent content in Posts on Chenruohan个人博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 29 May 2024 15:59:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 18 Jun 2024 16:20:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>vfio-mdev使用</title>
+      <link>https://caojunsheng.github.io/posts/linux/vfio-mdev/</link>
+      <pubDate>Tue, 18 Jun 2024 16:20:28 +0800</pubDate>
+      
+      <guid>https://caojunsheng.github.io/posts/linux/vfio-mdev/</guid>
+      <description>使用vfio-mdev modprobe vfio_pci cd /usr/src/linux-5.10.0-60.18.0.50.x86_64/ make modules make M=usr/src/linux-5.10.0-60.18.0.50.x86_64/drivers/vfio/ -C /usr/src/linux-5.10.0-60.18.0.50.x86_64 -j10 CONFIG_VFIO_MDEV=m insmod mdev.ko insmod vfio_mdev.ko make M=/home/cjs/usr/src/linux-5.10.0-60.18.0.50..x86_64/samples/vfio-mdev/ -C /home/cjs/usr/src/linux-5.10.0-60.18.0.50.r1064_55.hce2.x86_64 -j10 CONFIG_SAMPLE_VFIO_MDEV_MTTY=m echo &amp;ldquo;83b8f4f2-509f-382f-3c1e-e6bfe0fa1001&amp;rdquo; &amp;gt; /sys/devices/virtual/mtty/mtty/mdev_supported_types/mtty-2/create qemu-kvm -machine q35,accel=kvm -cpu host -smp 8 -m 16G -drive if=none,id=root,file=./centos7.2_cn.qcow2_par -device virtio-blk-pci,drive=root,disable-legacy=on</description>
+    </item>
+    
     <item>
       <title>Virtio PCI设备配置空间详解</title>
       <link>https://caojunsheng.github.io/posts/linux/virtio_blk%E8%AE%BE%E5%A4%87%E9%85%8D%E7%BD%AE%E7%A9%BA%E9%97%B4/</link>
