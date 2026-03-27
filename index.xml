@@ -180,15 +180,6 @@
     
     <item>
       <title></title>
-      <link>https://caojunsheng.github.io/posts/k8s-operator/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://caojunsheng.github.io/posts/k8s-operator/</guid>
-      <description>Kubernetes Operator 完整详解（含核心机制与全流程） 一、Operator 核心定义与本质 Operator 是 Kubernetes 标准的扩展组件，基于 CRD</description>
-    </item>
-    
-    <item>
-      <title></title>
       <link>https://caojunsheng.github.io/posts/linux/dpdk-spdk/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
