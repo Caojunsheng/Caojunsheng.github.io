@@ -6,7 +6,16 @@
     <description>Recent content in Posts on Chenruohan个人博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 18 Jun 2024 16:29:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 27 Mar 2026 17:30:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Kubernetes Operator 完整详解</title>
+      <link>https://caojunsheng.github.io/posts/k8s-operator/</link>
+      <pubDate>Fri, 27 Mar 2026 17:30:28 +0800</pubDate>
+      
+      <guid>https://caojunsheng.github.io/posts/k8s-operator/</guid>
+      <description>Kubernetes Operator 完整详解（含核心机制与全流程） 一、Operator 核心定义与本质 Operator 是 Kubernetes 标准的扩展组件，基于 CRD</description>
+    </item>
+    
     <item>
       <title>virtio_net设备初始化流程</title>
       <link>https://caojunsheng.github.io/posts/linux/virtio/</link>

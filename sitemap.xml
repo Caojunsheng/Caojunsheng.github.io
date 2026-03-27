@@ -3,24 +3,45 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://caojunsheng.github.io/categories/</loc>
-    <lastmod>2024-06-26T10:45:27+08:00</lastmod>
+    <lastmod>2026-03-27T17:37:29+08:00</lastmod>
   </url><url>
     <loc>https://caojunsheng.github.io/</loc>
-    <lastmod>2024-06-26T10:45:27+08:00</lastmod>
+    <lastmod>2026-03-27T17:37:29+08:00</lastmod>
+  </url><url>
+    <loc>https://caojunsheng.github.io/tags/crd/</loc>
+    <lastmod>2026-03-27T17:37:29+08:00</lastmod>
+  </url><url>
+    <loc>https://caojunsheng.github.io/tags/k8s/</loc>
+    <lastmod>2026-03-27T17:37:29+08:00</lastmod>
+  </url><url>
+    <loc>https://caojunsheng.github.io/tags/kubernetes/</loc>
+    <lastmod>2026-03-27T17:37:29+08:00</lastmod>
+  </url><url>
+    <loc>https://caojunsheng.github.io/series/kubernetes/</loc>
+    <lastmod>2026-03-27T17:37:29+08:00</lastmod>
+  </url><url>
+    <loc>https://caojunsheng.github.io/categories/kubernetes/</loc>
+    <lastmod>2026-03-27T17:37:29+08:00</lastmod>
+  </url><url>
+    <loc>https://caojunsheng.github.io/posts/k8s-operator/</loc>
+    <lastmod>2026-03-27T17:37:29+08:00</lastmod>
+  </url><url>
+    <loc>https://caojunsheng.github.io/tags/operator/</loc>
+    <lastmod>2026-03-27T17:37:29+08:00</lastmod>
+  </url><url>
+    <loc>https://caojunsheng.github.io/posts/</loc>
+    <lastmod>2026-03-27T17:37:29+08:00</lastmod>
+  </url><url>
+    <loc>https://caojunsheng.github.io/series/</loc>
+    <lastmod>2026-03-27T17:37:29+08:00</lastmod>
+  </url><url>
+    <loc>https://caojunsheng.github.io/tags/</loc>
+    <lastmod>2026-03-27T17:37:29+08:00</lastmod>
   </url><url>
     <loc>https://caojunsheng.github.io/series/linux/</loc>
     <lastmod>2024-06-26T10:45:27+08:00</lastmod>
   </url><url>
     <loc>https://caojunsheng.github.io/categories/linux/</loc>
-    <lastmod>2024-06-26T10:45:27+08:00</lastmod>
-  </url><url>
-    <loc>https://caojunsheng.github.io/posts/</loc>
-    <lastmod>2024-06-26T10:45:27+08:00</lastmod>
-  </url><url>
-    <loc>https://caojunsheng.github.io/series/</loc>
-    <lastmod>2024-06-26T10:45:27+08:00</lastmod>
-  </url><url>
-    <loc>https://caojunsheng.github.io/tags/</loc>
     <lastmod>2024-06-26T10:45:27+08:00</lastmod>
   </url><url>
     <loc>https://caojunsheng.github.io/tags/virtio/</loc>

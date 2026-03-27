@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>kubernetes on Chenruohan个人博客</title>
+    <link>https://caojunsheng.github.io/tags/kubernetes/</link>
+    <description>Recent content in kubernetes on Chenruohan个人博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 27 Mar 2026 17:30:28 +0800</lastBuildDate><atom:link href="https://caojunsheng.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Kubernetes Operator 完整详解</title>
+      <link>https://caojunsheng.github.io/posts/k8s-operator/</link>
+      <pubDate>Fri, 27 Mar 2026 17:30:28 +0800</pubDate>
+      
+      <guid>https://caojunsheng.github.io/posts/k8s-operator/</guid>
+      <description>Kubernetes Operator 完整详解（含核心机制与全流程） 一、Operator 核心定义与本质 Operator 是 Kubernetes 标准的扩展组件，基于 CRD</description>
+    </item>
+    
+  </channel>
+</rss>
