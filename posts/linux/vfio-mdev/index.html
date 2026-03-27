@@ -267,18 +267,28 @@
 
 
 
-<script type="module">  
-    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs'; 
-    mermaid.initialize({ startOnLoad: true });  
-</script>  
-<script>  
+<script type="module">
     
-    Array.from(document.getElementsByClassName("language-mermaid")).forEach(  
-        (el) => {  
-            el.parentElement.outerHTML = `<div class="mermaid">${el.innerHTML}</div>`;  
-        }  
-    );  
-</script>  
+    document.addEventListener('DOMContentLoaded', async () => {
+        
+        document.querySelectorAll('code.language-mermaid').forEach(el => {
+            const pre = el.closest('pre');
+            
+            const mermaidDiv = document.createElement('div');
+            mermaidDiv.className = 'mermaid';
+            mermaidDiv.textContent = el.textContent;
+            
+            pre.parentNode.replaceChild(mermaidDiv, pre);
+        });
+
+        
+        const mermaid = await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs');
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+    });
+</script>
 <style>  
        
     .mermaid svg {  
