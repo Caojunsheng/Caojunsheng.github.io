@@ -11,7 +11,7 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://caojunsheng.github.io/posts/k8s-operator/" /><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2026-03-27T17:30:28+08:00" />
-<meta property="article:modified_time" content="2026-03-27T17:37:29+08:00" />
+<meta property="article:modified_time" content="2026-03-27T17:46:03+08:00" />
 
 
 
@@ -267,6 +267,26 @@
 
 
 
+  
+<script type="module">  
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs'; 
+    mermaid.initialize({ startOnLoad: true });  
+</script>  
+<script>  
+    
+    Array.from(document.getElementsByClassName("language-mermaid")).forEach(  
+        (el) => {  
+            el.parentElement.outerHTML = `<div class="mermaid">${el.innerHTML}</div>`;  
+        }  
+    );  
+</script>  
+<style>  
+       
+    .mermaid svg {  
+        display: block;  
+        margin: auto;  
+    }  
+</style>  
 
 <div class="zhuti-0">
     <div class="container">
@@ -1223,8 +1243,8 @@
 <p>Operator 是 K8s 最核心的扩展方式，本质是<strong>自定义的 Workload Controller</strong>，依托 CRD 实现资源扩展，通过 HTTPS 长连接监听资源变化，借助 OwnerReference 实现精准事件管控，依靠调和循环完成自治运维。</p>
 <p>它的设计遵循 K8s 递归自治思想：内置控制器管理 Operator 本身，Operator 管理自定义业务资源，全程实现无人工干预的自动化运维，是云原生有状态应用、中间件、异构资源管理的标准方案。</p>
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTY4NzM3MDAwNywtMjE0MzE0NzY4Miw2OT
-AzNjg3NTVdfQ==
+eyJoaXN0b3J5IjpbLTExMzQ3NjcwNTIsMTY4NzM3MDAwNywtMj
+E0MzE0NzY4Miw2OTAzNjg3NTVdfQ==
 -->
             </div>
             
